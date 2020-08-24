@@ -521,6 +521,8 @@ class _FloatingSearchBar extends StatefulWidget {
 
 class FloatingSearchBarState extends State<_FloatingSearchBar>
     with TickerProviderStateMixin {
+  static const Duration _translateDuration = Duration(milliseconds: 950);
+
   dynamic get progress => widget.progress;
 
   FloatingSearchBarStyle get style => widget.style;
@@ -560,6 +562,7 @@ class FloatingSearchBarState extends State<_FloatingSearchBar>
   Duration get implicitDuration => const Duration(milliseconds: 400);
 
   AnimationController _translateController;
+  CurvedAnimation _translateAnimation;
 
   FloatingSearchBarTransition transition;
   ScrollController _scrollController;
@@ -620,7 +623,15 @@ class FloatingSearchBarState extends State<_FloatingSearchBar>
         );
       });
 
-    _translateController = AnimationController(vsync: this, duration: implicitDuration);
+    _translateController = AnimationController(
+      vsync: this,
+      duration: _translateDuration,
+    );
+
+    _translateAnimation = CurvedAnimation(
+      parent: _translateController,
+      curve: Curves.easeInOut,
+    );
 
     _controller = AnimationController(vsync: this, duration: duration)
       ..addStatusListener((status) {
@@ -718,15 +729,29 @@ class FloatingSearchBarState extends State<_FloatingSearchBar>
 
   double _lastPixel = 0.0;
 
+  void _setTranslateCurve(Curve curve) {
+    if (_translateAnimation.curve != curve) {
+      setState(() {
+        _translateAnimation = CurvedAnimation(
+          parent: _translateController,
+          curve: curve,
+        );
+      });
+    }
+  }
+
   bool _onBodyScroll(FloatingSearchBarScrollNotification notification) {
     if (_controller.isDismissed) {
       final pixel = notification.metrics.pixels;
       final didReleasePointer = pixel == _lastPixel;
 
       if (didReleasePointer) {
+        _setTranslateCurve(Curves.easeInOutCubic);
         final hide = pixel > 0.0 && _translateController.value > 0.5;
         hide ? _translateController.forward() : _translateController.reverse();
       } else {
+        _setTranslateCurve(Curves.linear);
+
         final delta = pixel - _lastPixel;
 
         _translateController.value += delta / (height + _toEdgeInsets(margins).top);
@@ -831,7 +856,7 @@ class FloatingSearchBarState extends State<_FloatingSearchBar>
             position: Tween(
               begin: Offset.zero,
               end: const Offset(0.0, -1.0),
-            ).animate(_translateController),
+            ).animate(_translateAnimation),
             child: container,
           ),
         );

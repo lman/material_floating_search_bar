@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
@@ -43,8 +45,15 @@ class MaterialFloatingSearchBarExample extends StatelessWidget {
   }
 }
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   const Home({Key key}) : super(key: key);
+
+  @override
+  _HomeState createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  int index = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -55,19 +64,11 @@ class Home extends StatelessWidget {
           width: 200,
         ),
       ),
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          buildMap(),
-          buildBottomNavigationBar(),
-          buildFabs(),
-          buildSearchBar(context),
-        ],
-      ),
+      body: buildSearchBar(),
     );
   }
 
-  Widget buildSearchBar(BuildContext context) {
+  Widget buildSearchBar() {
     final actions = [
       FloatingSearchBarAction(
         showIfOpened: false,
@@ -99,34 +100,54 @@ class Home extends StatelessWidget {
           progress: model.isLoading,
           debounceDelay: const Duration(milliseconds: 500),
           onQueryChanged: model.onQueryChanged,
-          transition: SlideFadeFloatingSearchBarTransition(translation: 48.0),
-          builder: (context, transition) {
-            return Material(
-              color: Colors.white,
-              elevation: 4.0,
-              borderRadius: BorderRadius.circular(8),
-              child: ImplicitlyAnimatedList<Place>(
-                shrinkWrap: true,
-                items: model.suggestions.take(6).toList(),
-                physics: const NeverScrollableScrollPhysics(),
-                areItemsTheSame: (a, b) => a == b,
-                itemBuilder: (context, animation, place, i) {
-                  return SizeFadeTransition(
-                    animation: animation,
-                    child: buildItem(context, place),
-                  );
-                },
-                updateItemBuilder: (context, animation, place) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: buildItem(context, place),
-                  );
-                },
-              ),
-            );
-          },
+          transition: CircularFloatingSearchBarTransition(),
+          builder: (context, _) => buildExpandableBody(model),
+          body: buildBody(),
         );
       },
+    );
+  }
+
+  Widget buildBody() {
+    return Column(
+      children: [
+        Expanded(
+          child: IndexedStack(
+            index: index,
+            children: const [
+              Map(),
+              SomeScrollableContent(),
+            ],
+          ),
+        ),
+        buildBottomNavigationBar(),
+      ],
+    );
+  }
+
+  Widget buildExpandableBody(SearchModel model) {
+    return Material(
+      color: Colors.white,
+      elevation: 4.0,
+      borderRadius: BorderRadius.circular(8),
+      child: ImplicitlyAnimatedList<Place>(
+        shrinkWrap: true,
+        items: model.suggestions.take(6).toList(),
+        physics: const NeverScrollableScrollPhysics(),
+        areItemsTheSame: (a, b) => a == b,
+        itemBuilder: (context, animation, place, i) {
+          return SizeFadeTransition(
+            animation: animation,
+            child: buildItem(context, place),
+          );
+        },
+        updateItemBuilder: (context, animation, place) {
+          return FadeTransition(
+            opacity: animation,
+            child: buildItem(context, place),
+          );
+        },
+      ),
     );
   }
 
@@ -188,11 +209,63 @@ class Home extends StatelessWidget {
     );
   }
 
+  Widget buildBottomNavigationBar() {
+    return BottomNavigationBar(
+      onTap: (value) => setState(() => index = min(value, 1)),
+      currentIndex: index,
+      elevation: 16,
+      type: BottomNavigationBarType.fixed,
+      showUnselectedLabels: true,
+      backgroundColor: Colors.white,
+      selectedItemColor: Colors.blue,
+      selectedFontSize: 11.5,
+      unselectedFontSize: 11.5,
+      unselectedItemColor: const Color(0xFF4d4d4d),
+      items: const [
+        BottomNavigationBarItem(
+          icon: Icon(MdiIcons.homeVariantOutline),
+          title: Text('Explore'),
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(MdiIcons.homeCityOutline),
+          title: Text('Commute'),
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(MdiIcons.bookmarkOutline),
+          title: Text('Saved'),
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(MdiIcons.plusCircleOutline),
+          title: Text('Contribute'),
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(MdiIcons.bellOutline),
+          title: Text('Updates'),
+        ),
+      ],
+    );
+  }
+}
+
+class Map extends StatelessWidget {
+  const Map({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        buildMap(),
+        buildFabs(),
+      ],
+    );
+  }
+
   Widget buildFabs() {
     return Align(
       alignment: AlignmentDirectional.bottomEnd,
       child: Padding(
-        padding: const EdgeInsetsDirectional.only(bottom: 72, end: 16),
+        padding: const EdgeInsetsDirectional.only(bottom: 16, end: 16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -213,51 +286,29 @@ class Home extends StatelessWidget {
     );
   }
 
-  Widget buildBottomNavigationBar() {
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: BottomNavigationBar(
-        currentIndex: 0,
-        elevation: 16,
-        type: BottomNavigationBarType.fixed,
-        showUnselectedLabels: true,
-        backgroundColor: Colors.white,
-        selectedItemColor: Colors.blue,
-        selectedFontSize: 11.5,
-        unselectedFontSize: 11.5,
-        unselectedItemColor: const Color(0xFF4d4d4d),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(MdiIcons.homeVariantOutline),
-            title: Text('Explore'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(MdiIcons.homeCityOutline),
-            title: Text('Commute'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(MdiIcons.bookmarkOutline),
-            title: Text('Saved'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(MdiIcons.plusCircleOutline),
-            title: Text('Contribute'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(MdiIcons.bellOutline),
-            title: Text('Updates'),
-          ),
-        ],
-      ),
+  Widget buildMap() {
+    return Image.asset(
+      'assets/map.jpg',
+      fit: BoxFit.cover,
     );
   }
+}
 
-  Widget buildMap() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 52.0),
-      child: Image.asset(
-        'assets/map.jpg',
-        fit: BoxFit.cover,
+class SomeScrollableContent extends StatelessWidget {
+  const SomeScrollableContent({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FloatingSearchBarScrollNotifier(
+      child: ListView.separated(
+        padding: const EdgeInsets.only(top: kToolbarHeight),
+        itemCount: 100,
+        separatorBuilder: (context, index) => const Divider(),
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: Text('Item $index'),
+          );
+        },
       ),
     );
   }

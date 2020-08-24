@@ -17,7 +17,7 @@ Click [here](https://github.com/bnxm/material_floating_search_bar/blob/master/ex
 Add it to your `pubspec.yaml` file:
 ```yaml
 dependencies:
-  material_floating_search_bar: ^0.1.5
+  material_floating_search_bar: ^0.1.6
 ```
 Install packages from the command line
 ```
@@ -78,7 +78,7 @@ Widget buildFloatingSearchBar() {
         showIfClosed: false,
       ),
     ],
-    bodyBuilder: (context, transition) {
+    builder: (context, transition) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(8),
         child: Material(
@@ -111,7 +111,7 @@ There are many customization options:
 
 | Field                       | Description             |
 | --------------------------- | ----------------------- |
-| `body`                      | The widget displayed below the `FloatingSearchBar`. <br><br> This is useful, if the `FloatingSearchBar` should react to scroll events (i.e. hide from view when a `Scrollable` is being scrolled down and show it again when scrolled up).
+| `body`                      | The widget displayed below the `FloatingSearchBar`. <br><br> This is useful, if the `FloatingSearchBar` should react to scroll events (i.e. hide from view when a `Scrollable` is being scrolled down and show it again when scrolled up). See [here](#Scrolling) for more info.
 | `accentColor`               | The color used for elements such as the progress indicator. <br><br> Defaults to the themes accent color if not specified. 
 | `backgroundColor`           | The color of the card. <br><br> If not specified, defaults to `theme.cardColor`.
 | `shadowColor`               | The color of the shadow drawn when `elevation > 0`. <br><br> If not specified, defaults to `Colors.black54`.
@@ -160,4 +160,43 @@ As of now there are three types of transitions that are exemplified above:
 | `SlideFadeFloatingSearchBarTransition` | Vertically slides and fades its child.
 
 You can also easily create you own custom transition by extending `FloatingSearchBarTransition`.
+
+### Scrolling
+
+<img width="216px" alt="Scrolling" src="https://raw.githubusercontent.com/bnxm/material_floating_search_bar/master/assets/scrolling_demo.gif"/>
+
+A common behavior for floating search bars is to disappear when the user scrolls a Scrollable down and appear again when scrolling up. This can be easily achieved by passing your `Widget` to the `body` field of `FloatingSearchBar`. This way `FloatingSearchBar` can listen for `ScrollNotifications`. In order that the `FloatingSearchBar` doesn't interact with every `Scrollable` below in the widget tree, you should wrap every `Scrollable` that should interact with the `FloatingSearchBar` inside a `FloatingSearchBarScrollNotifier`.
+
+#### Example
+
+```dart
+@override
+Widget build(BuildContext context) {
+  return FloatingSearchBar(
+    // Your pages or just a simple Scaffold...
+    body: IndexedStack(
+      children: [
+        MyAwesomePage(),
+      ],
+    ),
+  );
+}
+
+class MyAwesomePage extends StatelessWidget {
+@override
+Widget build(BuildContext context) {
+  /// Wrap you Scrollable in a FloatingSearchBarScrollNotifier
+  /// to indicate that the FloatingSearchBar should react to
+  /// scroll events from this Scrollable.
+  return FloatingSearchBarScrollNotifier(
+    child: ListView.builder(
+      itemCount: 42,
+      itemBuilder: (_, index) => Item('Item $index'),
+    ),
+  );
+}
+}
+```
+
+
 
