@@ -163,7 +163,7 @@ You can also easily create you own custom transition by extending `FloatingSearc
 
 ### Scrolling
 
-<img width="216px" alt="Scrolling" src="https://raw.githubusercontent.com/bnxm/material_floating_search_bar/master/assets/scrolling_demo.gif"/>
+<img width="216px" alt="Scrolling" src="https://raw.githubusercontent.com/bnxm/material_floating_search_bar/master/assets/scroll_demo.gif"/>
 
 A common behavior for floating search bars is to disappear when the user scrolls a Scrollable down and appear again when scrolling up. This can be easily achieved by passing your `Widget` to the `body` field of `FloatingSearchBar`. This way `FloatingSearchBar` can listen for `ScrollNotifications`. In order that the `FloatingSearchBar` doesn't interact with every `Scrollable` below in the widget tree, you should wrap every `Scrollable` that should interact with the `FloatingSearchBar` inside a `FloatingSearchBarScrollNotifier`.
 
