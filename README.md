@@ -170,31 +170,33 @@ A common behavior for floating search bars is to disappear when the user scrolls
 #### Example
 
 ```dart
-@override
-Widget build(BuildContext context) {
-  return FloatingSearchBar(
-    // Your pages or just a simple Scaffold...
-    body: IndexedStack(
-      children: [
-        MyAwesomePage(),
-      ],
-    ),
-  );
+class Home extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return FloatingSearchBar(
+      // Your pages or just a simple Scaffold...
+      body: IndexedStack(
+        children: [
+          MyAwesomePage(),
+        ],
+      ),
+    );
+  }
 }
 
 class MyAwesomePage extends StatelessWidget {
-@override
-Widget build(BuildContext context) {
-  /// Wrap you Scrollable in a FloatingSearchBarScrollNotifier
-  /// to indicate that the FloatingSearchBar should react to
-  /// scroll events from this Scrollable.
-  return FloatingSearchBarScrollNotifier(
-    child: ListView.builder(
-      itemCount: 42,
-      itemBuilder: (_, index) => Item('Item $index'),
-    ),
-  );
-}
+  @override
+  Widget build(BuildContext context) {
+    /// Wrap you Scrollable in a FloatingSearchBarScrollNotifier
+    /// to indicate that the FloatingSearchBar should react to
+    /// scroll events from this Scrollable.
+    return FloatingSearchBarScrollNotifier(
+      child: ListView.builder(
+        itemCount: 42,
+        itemBuilder: (_, index) => Item('Item $index'),
+      ),
+    );
+  }
 }
 ```
 
