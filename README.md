@@ -187,7 +187,7 @@ class Home extends StatelessWidget {
 class MyAwesomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    /// Wrap you Scrollable in a FloatingSearchBarScrollNotifier
+    /// Wrap your Scrollable in a FloatingSearchBarScrollNotifier
     /// to indicate that the FloatingSearchBar should react to
     /// scroll events from this Scrollable.
     return FloatingSearchBarScrollNotifier(
