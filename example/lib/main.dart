@@ -53,7 +53,15 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  int index = 0;
+  int _index = 0;
+  int get index => _index;
+  set index(int value) {
+    _index = min(value, 2);
+    _index == 2 ? controller.hide() : controller.show();
+    setState(() {});
+  }
+
+  final controller = FloatingSearchBarController();
 
   @override
   Widget build(BuildContext context) {
@@ -87,9 +95,11 @@ class _HomeState extends State<Home> {
     return Consumer<SearchModel>(
       builder: (context, model, _) {
         return FloatingSearchBar(
+          controller: controller,
           backgroundColor: Colors.white,
           clearQueryOnClose: true,
           hint: 'Search for a new Place...',
+          iconColor: Colors.grey,
           transitionDuration: const Duration(milliseconds: 800),
           transitionCurve: Curves.easeInOutCubic,
           physics: const BouncingScrollPhysics(),
@@ -113,10 +123,11 @@ class _HomeState extends State<Home> {
       children: [
         Expanded(
           child: IndexedStack(
-            index: index,
+            index: min(index, 2),
             children: const [
               Map(),
               SomeScrollableContent(),
+              FloatingSearchAppBarExample(),
             ],
           ),
         ),
@@ -211,7 +222,7 @@ class _HomeState extends State<Home> {
 
   Widget buildBottomNavigationBar() {
     return BottomNavigationBar(
-      onTap: (value) => setState(() => index = min(value, 1)),
+      onTap: (value) => index = value,
       currentIndex: index,
       elevation: 16,
       type: BottomNavigationBarType.fixed,
@@ -301,6 +312,26 @@ class SomeScrollableContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return FloatingSearchBarScrollNotifier(
       child: ListView.separated(
+        padding: const EdgeInsets.only(top: kToolbarHeight),
+        itemCount: 100,
+        separatorBuilder: (context, index) => const Divider(),
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: Text('Item $index'),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class FloatingSearchAppBarExample extends StatelessWidget {
+  const FloatingSearchAppBarExample({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FloatingSearchAppBar(
+      body: ListView.separated(
         padding: const EdgeInsets.only(top: kToolbarHeight),
         itemCount: 100,
         separatorBuilder: (context, index) => const Divider(),

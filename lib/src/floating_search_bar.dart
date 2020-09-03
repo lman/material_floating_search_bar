@@ -1,25 +1,25 @@
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 
 import 'floating_search_bar_actions.dart';
 import 'floating_search_bar_dismissable.dart';
-import 'floating_search_bar_style.dart';
 import 'floating_search_bar_transition.dart';
+import 'search_bar_style.dart';
 import 'text_controller.dart';
 import 'util/util.dart';
 import 'widgets/widgets.dart';
+
+part 'floating_search_app_bar.dart';
 
 // ignore_for_file: public_member_api_docs
 
 typedef FloatingSearchBarBuilder = Widget Function(
     BuildContext context, Animation<double> transition);
-
-typedef OnQueryChangeCallback = void Function(String query);
-
-typedef OnFocusChangeCallback = void Function(bool isFocused);
 
 /// An expandable material floating search bar with customizable
 /// transitions similar to the ones used extensively
@@ -214,15 +214,15 @@ class FloatingSearchBar extends ImplicitAnimation {
   /// See also:
   ///   * [debounceDelay] to delay the invocation of the callback
   ///   until the user stopped typing.
-  final OnQueryChangeCallback onQueryChanged;
+  final OnQueryChangedCallback onQueryChanged;
 
   /// A callback that gets invoked when the user submitted
   /// their query (e.g. hit the search button).
-  final OnQueryChangeCallback onSubmitted;
+  final OnQueryChangedCallback onSubmitted;
 
   /// A callback that gets invoked when the [FloatingSearchBar]
   /// receives or looses focus.
-  final OnFocusChangeCallback onFocusChanged;
+  final OnFocusChangedCallback onFocusChanged;
 
   /// The transition to be used for animating between closed
   /// and opened state.
@@ -358,29 +358,10 @@ class FloatingSearchBar extends ImplicitAnimation {
 
 class _FloatingSearchBarState
     extends ImplicitAnimationState<FloatingSearchBarStyle, FloatingSearchBar> {
-  bool get hasActions => actions.isNotEmpty;
-  List<Widget> get actions {
-    final actions = widget.actions ?? [FloatingSearchBarAction.searchToClear()];
-    final hasEndDrawer = Scaffold.of(context)?.hasEndDrawer ?? false;
-    final showHamburgerMenu = hasEndDrawer && widget.showDrawerHamburger;
-    return showHamburgerMenu
-        ? <Widget>[...actions, FloatingSearchBarAction.hamburgerToBack()]
-        : actions;
-  }
-
-  bool get hasStartActions => startActions.isNotEmpty;
-  List<Widget> get startActions {
-    final actions = widget.startActions ?? const <Widget>[];
-    final hasDrawer = Scaffold.of(context)?.hasDrawer ?? false;
-    final showHamburgerMenu = hasDrawer && widget.showDrawerHamburger;
-    return showHamburgerMenu
-        ? <Widget>[FloatingSearchBarAction.hamburgerToBack(), ...actions]
-        : actions;
-  }
-
   @override
   FloatingSearchBarStyle get newValue {
     final theme = Theme.of(context);
+    final direction = Directionality.of(context);
 
     return FloatingSearchBarStyle(
       height: widget.height ?? 48.0,
@@ -388,28 +369,18 @@ class _FloatingSearchBarState
       maxWidth: widget.maxWidth,
       openMaxWidth: widget.openMaxWidth ?? widget.maxWidth,
       axisAlignment: widget.axisAlignment ?? 0.0,
-      openAxisAlignment:
-          widget.openAxisAlignment ?? widget.axisAlignment ?? 0.0,
-      accentColor: widget.accentColor ?? theme.accentColor,
+      openAxisAlignment: widget.openAxisAlignment ?? widget.axisAlignment ?? 0.0,
       backgroundColor: widget.backgroundColor ?? theme.cardColor,
-      iconColor: widget.iconColor ?? theme.iconTheme.color,
-      backdropColor: widget.backdropColor ??
-          widget.transition.backdropColor ??
-          Colors.black26,
-      shadowColor: widget.shadowColor ?? Colors.black54,
+      shadowColor: widget.shadowColor ?? Colors.black45,
+      backdropColor:
+          widget.backdropColor ?? widget.transition.backdropColor ?? Colors.black26,
       border: widget.border ?? BorderSide.none,
       borderRadius: widget.borderRadius ?? BorderRadius.circular(4),
       margins: widget.margins ??
-          EdgeInsets.fromLTRB(
-              8, MediaQuery.of(context).viewPadding.top + 6, 8, 0),
-      padding: widget.padding ??
-          EdgeInsetsDirectional.only(
-              start: hasStartActions ? 12 : 0, end: hasActions ? 12 : 0),
-      insets: widget.insets ??
-          EdgeInsetsDirectional.only(
-              start: hasStartActions ? 16 : 24, end: hasActions ? 16 : 24),
-      hintStyle: widget.hintStyle,
-      queryStyle: widget.queryStyle,
+          EdgeInsets.fromLTRB(8, MediaQuery.of(context).viewPadding.top + 6, 8, 0)
+              .resolve(direction),
+      padding: widget.padding,
+      insets: widget.insets,
     );
   }
 
@@ -423,6 +394,10 @@ class _FloatingSearchBarState
     return _FloatingSearchBar(
       body: widget.body,
       style: style,
+      accentColor: widget.accentColor,
+      hintStyle: widget.hintStyle,
+      queryStyle: widget.queryStyle,
+      iconColor: widget.iconColor,
       clearQueryOnClose: widget.clearQueryOnClose,
       showDrawerHamburger: widget.showDrawerHamburger,
       closeOnBackdropTap: widget.closeOnBackdropTap,
@@ -432,8 +407,8 @@ class _FloatingSearchBarState
       debounceDelay: widget.debounceDelay,
       title: widget.title,
       hint: widget.hint,
-      actions: actions,
-      startActions: startActions,
+      actions: widget.actions,
+      startActions: widget.startActions,
       onQueryChanged: widget.onQueryChanged,
       onFocusChanged: widget.onFocusChanged,
       onSubmitted: widget.onSubmitted,
@@ -449,6 +424,8 @@ class _FloatingSearchBarState
       physics: widget.physics,
       scrollController: widget.scrollController,
       scrollPadding: widget.scrollPadding,
+      implicitDuration: widget.duration,
+      implicitCurve: widget.curve,
     );
   }
 }
@@ -456,6 +433,10 @@ class _FloatingSearchBarState
 class _FloatingSearchBar extends StatefulWidget {
   final Widget body;
   final FloatingSearchBarStyle style;
+  final Color accentColor;
+  final Color iconColor;
+  final TextStyle queryStyle;
+  final TextStyle hintStyle;
 
   // * --- Utility --- *
   final bool clearQueryOnClose;
@@ -469,9 +450,9 @@ class _FloatingSearchBar extends StatefulWidget {
   final dynamic hint;
   final List<Widget> actions;
   final List<Widget> startActions;
-  final OnQueryChangeCallback onQueryChanged;
-  final OnFocusChangeCallback onFocusChanged;
-  final OnQueryChangeCallback onSubmitted;
+  final OnQueryChangedCallback onQueryChanged;
+  final OnFocusChangedCallback onFocusChanged;
+  final OnQueryChangedCallback onSubmitted;
   final FloatingSearchBarTransition transition;
   final FloatingSearchBarBuilder bodyBuilder;
   final FloatingSearchBarController controller;
@@ -480,6 +461,8 @@ class _FloatingSearchBar extends StatefulWidget {
   final bool autocorrect;
   final ToolbarOptions toolbarOptions;
   final Duration showAfter;
+  final Duration implicitDuration;
+  final Curve implicitCurve;
 
   // * --- Scrolling --- *
   final bool isScrollControlled;
@@ -490,6 +473,10 @@ class _FloatingSearchBar extends StatefulWidget {
     Key key,
     @required this.body,
     @required this.style,
+    @required this.accentColor,
+    @required this.iconColor,
+    @required this.queryStyle,
+    @required this.hintStyle,
     @required this.clearQueryOnClose,
     @required this.showDrawerHamburger,
     @required this.closeOnBackdropTap,
@@ -516,6 +503,8 @@ class _FloatingSearchBar extends StatefulWidget {
     @required this.physics,
     @required this.scrollController,
     @required this.scrollPadding,
+    @required this.implicitDuration,
+    @required this.implicitCurve,
   }) : super(key: key);
 
   @override
@@ -524,6 +513,9 @@ class _FloatingSearchBar extends StatefulWidget {
 
 class FloatingSearchBarState extends State<_FloatingSearchBar>
     with TickerProviderStateMixin {
+  final GlobalKey<FloatingSearchAppBarState> barKey = GlobalKey();
+  FloatingSearchAppBarState get barState => barKey.currentState;
+
   static const Duration _translateDuration = Duration(milliseconds: 950);
 
   dynamic get progress => widget.progress;
@@ -535,12 +527,8 @@ class FloatingSearchBarState extends State<_FloatingSearchBar>
   double get openMaxWidth => style.openMaxWidth;
   double get axisAlignment => style.axisAlignment;
   double get openAxisAlignment => style.openAxisAlignment;
-
-  Color get accentColor => style.accentColor;
   Color get backgroundColor => style.backgroundColor;
-  Color get iconColor => style.iconColor;
   Color get backdropColor => style.backdropColor;
-  Color get shadowColor => style.shadowColor;
 
   BorderRadius get borderRadius => style.borderRadius;
 
@@ -555,13 +543,9 @@ class FloatingSearchBarState extends State<_FloatingSearchBar>
   Duration get duration => widget.transitionDuration;
   Duration get queryCallbackDelay => widget.debounceDelay;
 
-  TextController _input;
-  final Handler _handler = Handler();
-
   AnimationController _controller;
   CurvedAnimation _animation;
   CurvedAnimation get animation => _animation;
-  Animation _queryToTitleAnimation;
   Duration get implicitDuration => const Duration(milliseconds: 400);
 
   AnimationController _translateController;
@@ -570,23 +554,12 @@ class FloatingSearchBarState extends State<_FloatingSearchBar>
   FloatingSearchBarTransition transition;
   ScrollController _scrollController;
 
-  bool _isOpen = false;
-  bool get isOpen => _isOpen;
+  bool get isOpen => barState?.isOpen ?? false;
   set isOpen(bool value) {
     if (value == isOpen) return;
+    barState?.isOpen = value;
 
-    _isOpen = value;
-    widget.onFocusChanged?.call(isOpen);
-
-    if (isOpen) {
-      _input.requestFocus();
-      _controller.forward();
-    } else {
-      _input.clearFocus(context);
-      _controller.reverse();
-    }
-
-    setState(() {});
+    value ? _controller.forward() : _controller.reverse();
   }
 
   bool get isVisible => _translateController.isDismissed;
@@ -598,10 +571,6 @@ class FloatingSearchBarState extends State<_FloatingSearchBar>
       value ? _translateController.reverse() : _translateController.forward();
     }
   }
-
-  final ValueNotifier<String> queryListener = ValueNotifier('');
-  String get query => queryListener.value;
-  set query(String value) => _input.text = value;
 
   final ValueNotifier<int> _barRebuilder = ValueNotifier(0);
   void rebuild() => _barRebuilder.value++;
@@ -615,16 +584,15 @@ class FloatingSearchBarState extends State<_FloatingSearchBar>
   @override
   void initState() {
     super.initState();
-    _input = TextController()
-      ..addListener(() {
-        queryListener.value = _input.text;
 
-        _handler.post(
-          // Do not add a delay when the query is empty.
-          query.isEmpty ? Duration.zero : queryCallbackDelay,
-          () => widget.onQueryChanged?.call(query),
-        );
+    _controller = AnimationController(vsync: this, duration: duration)
+      ..addStatusListener((status) {
+        if (status == AnimationStatus.dismissed) {
+          _onClosed();
+        }
       });
+
+    _animation = CurvedAnimation(parent: _controller, curve: curve);
 
     _translateController = AnimationController(
       vsync: this,
@@ -635,19 +603,6 @@ class FloatingSearchBarState extends State<_FloatingSearchBar>
       parent: _translateController,
       curve: Curves.easeInOut,
     );
-
-    _controller = AnimationController(vsync: this, duration: duration)
-      ..addStatusListener((status) {
-        if (status == AnimationStatus.dismissed) {
-          _onClosed();
-        }
-      });
-
-    _animation = CurvedAnimation(parent: _controller, curve: curve);
-    _queryToTitleAnimation = TweenSequence([
-      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.0), weight: 1),
-      TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.0), weight: 1),
-    ]).animate(animation);
 
     transition = widget.transition ?? SlideFadeFloatingSearchBarTransition();
 
@@ -681,8 +636,7 @@ class FloatingSearchBarState extends State<_FloatingSearchBar>
       _assignController();
     }
 
-    if (widget.scrollController != null &&
-        widget.scrollController != _scrollController) {
+    if (widget.scrollController != null && widget.scrollController != _scrollController) {
       _scrollController = widget.scrollController;
     }
   }
@@ -691,20 +645,15 @@ class FloatingSearchBarState extends State<_FloatingSearchBar>
     final controller = widget.controller;
     if (controller == null) return;
 
-    controller._open = open;
-    controller._close = close;
-    controller._clear = clear;
     controller._show = show;
     controller._hide = hide;
   }
 
-  void open() => isOpen = true;
-  void close() => isOpen = false;
-
   void show() => isVisible = true;
   void hide() => isVisible = false;
 
-  void clear() => _input.clear();
+  void open() => isOpen = true;
+  void close() => isOpen = false;
 
   Future<bool> _onPop() async {
     if (isOpen) {
@@ -718,12 +667,10 @@ class FloatingSearchBarState extends State<_FloatingSearchBar>
   void _onClosed() {
     _offset = 0.0;
     _scrollController.jumpTo(0.0);
-
-    if (widget.clearQueryOnClose) clear();
   }
 
-  EdgeInsets _toEdgeInsets(EdgeInsetsGeometry insets) =>
-      insets.resolve(Directionality.of(context));
+  EdgeInsets _resolve(EdgeInsetsGeometry insets) =>
+      insets?.resolve(Directionality.of(context)) ?? EdgeInsets.zero;
 
   bool _onBuilderScroll(ScrollNotification notification) {
     _offset = notification.metrics.pixels;
@@ -758,8 +705,7 @@ class FloatingSearchBarState extends State<_FloatingSearchBar>
 
         final delta = pixel - _lastPixel;
 
-        _translateController.value +=
-            delta / (height + _toEdgeInsets(margins).top);
+        _translateController.value += delta / (height + _resolve(margins).top);
         _lastPixel = pixel;
       }
     }
@@ -817,7 +763,7 @@ class FloatingSearchBarState extends State<_FloatingSearchBar>
     final bar = ValueListenableBuilder(
       valueListenable: _barRebuilder,
       builder: (context, __, _) {
-        final padding = _toEdgeInsets(transition.lerpPadding());
+        final padding = _resolve(transition.lerpPadding());
         final borderRadius = transition.lerpBorderRadius();
 
         final container = Semantics(
@@ -828,29 +774,22 @@ class FloatingSearchBarState extends State<_FloatingSearchBar>
             padding: transition.lerpMargin(),
             child: Material(
               elevation: transition.lerpElevation(),
-              shadowColor: shadowColor,
+              shadowColor: style.shadowColor,
               borderRadius: borderRadius,
               child: Container(
                 height: transition.lerpHeight(),
-                padding:
-                    EdgeInsets.only(top: padding.top, bottom: padding.bottom),
+                padding: EdgeInsets.only(top: padding.top, bottom: padding.bottom),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: transition.lerpBackgroundColor(),
-                  border: style.border != null
-                      ? Border.fromBorderSide(style.border)
-                      : null,
+                  border:
+                      style.border != null ? Border.fromBorderSide(style.border) : null,
                   borderRadius: borderRadius,
                 ),
                 constraints: boxConstraints,
                 child: ClipRRect(
                   borderRadius: borderRadius,
-                  child: Stack(
-                    children: <Widget>[
-                      _buildInnerBar(),
-                      _buildProgressBar(),
-                    ],
-                  ),
+                  child: _buildInnerBar(),
                 ),
               ),
             ),
@@ -888,47 +827,45 @@ class FloatingSearchBarState extends State<_FloatingSearchBar>
   }
 
   Widget _buildInnerBar() {
-    Widget buildShader({bool isLeft}) {
-      final insets = _toEdgeInsets(this.insets);
-
-      return Align(
-        alignment: isLeft ? Alignment.centerLeft : Alignment.centerRight,
-        child: Transform.rotate(
-          angle: isLeft ? pi : 0.0,
-          child: Container(
-            width: isLeft ? insets.left + 2 : insets.right,
-            height: double.infinity,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  backgroundColor.withOpacity(0.0),
-                  backgroundColor.withOpacity(1.0),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-
-    final content = Row(
-      children: <Widget>[
-        ..._mapActions(widget.startActions),
-        Expanded(
-          child: Stack(
-            alignment: Alignment.centerLeft,
-            children: <Widget>[
-              _buildTextField(),
-              buildShader(isLeft: true),
-              buildShader(isLeft: false),
-            ],
-          ),
-        ),
-        ..._mapActions(widget.actions),
-      ],
+    final textField = FloatingSearchAppBar(
+      body: null,
+      barKey: barKey,
+      height: 1000,
+      elevation: 0.0,
+      controller: widget.controller,
+      backgroundColor: transition.lerpBackgroundColor(),
+      onFocusChanged: (isFocused) {
+        isOpen = isFocused;
+        widget.onFocusChanged?.call(isFocused);
+      },
+      implicitDuration: widget.implicitDuration,
+      implicitCurve: widget.implicitCurve,
+      title: widget.title,
+      actions: widget.actions,
+      startActions: widget.startActions,
+      autocorrect: widget.autocorrect,
+      clearQueryOnClose: widget.clearQueryOnClose,
+      debounceDelay: widget.debounceDelay,
+      hint: widget.hint,
+      onQueryChanged: widget.onQueryChanged,
+      onSubmitted: widget.onSubmitted,
+      progress: widget.progress,
+      showDrawerHamburger: widget.showDrawerHamburger,
+      toolbarOptions: widget.toolbarOptions,
+      transitionDuration: widget.transitionDuration,
+      transitionCurve: widget.transitionCurve,
+      textInputAction: widget.textInputAction,
+      textInputType: widget.textInputType,
+      accentColor: widget.accentColor,
+      hintStyle: widget.hintStyle,
+      iconColor: widget.iconColor,
+      insets: style.insets,
+      padding: style.padding,
+      queryStyle: widget.queryStyle,
+      shadowColor: style.shadowColor,
     );
 
-    final padding = _toEdgeInsets(transition.lerpPadding());
+    final padding = _resolve(transition.lerpPadding());
 
     return SizedBox.expand(
       child: Stack(
@@ -943,7 +880,7 @@ class FloatingSearchBarState extends State<_FloatingSearchBar>
             ),
           Material(
             elevation: transition.lerpInnerElevation(),
-            shadowColor: shadowColor,
+            shadowColor: style.shadowColor,
             child: Container(
               height: height,
               color: transition.lerpBackgroundColor(),
@@ -953,12 +890,10 @@ class FloatingSearchBarState extends State<_FloatingSearchBar>
                 children: [
                   Container(
                     constraints: maxWidth != null
-                        ? BoxConstraints(
-                            maxWidth: transition.lerpInnerMaxWidth())
+                        ? BoxConstraints(maxWidth: transition.lerpInnerMaxWidth())
                         : null,
-                    padding: EdgeInsets.only(
-                        left: padding.left, right: padding.right),
-                    child: content,
+                    padding: EdgeInsets.only(left: padding.left, right: padding.right),
+                    child: textField,
                   ),
                   Align(
                     alignment: Alignment.bottomCenter,
@@ -996,101 +931,6 @@ class FloatingSearchBarState extends State<_FloatingSearchBar>
     );
   }
 
-  Widget _buildTextField() {
-    final hasQuery = !widget.clearQueryOnClose && query.isNotEmpty;
-    final showTitle = widget.title != null || (!hasQuery && query.isNotEmpty);
-    final opacity = showTitle ? _queryToTitleAnimation.value : 1.0;
-
-    final showTextInput =
-        showTitle ? _controller.value > 0.5 : _controller.value > 0.0;
-
-    Widget input;
-    if (showTextInput) {
-      input = IntrinsicWidth(
-        child: TextField(
-          controller: _input,
-          scrollPadding: EdgeInsets.zero,
-          scrollPhysics: const NeverScrollableScrollPhysics(),
-          focusNode: _input.node,
-          maxLines: 1,
-          autofocus: false,
-          autocorrect: widget.autocorrect,
-          toolbarOptions: widget.toolbarOptions,
-          cursorColor: accentColor,
-          style: style.queryStyle,
-          textInputAction: widget.textInputAction,
-          keyboardType: widget.textInputType,
-          onSubmitted: widget.onSubmitted,
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: style.hintStyle,
-            contentPadding: EdgeInsets.zero,
-            border: InputBorder.none,
-            errorBorder: InputBorder.none,
-            enabledBorder: InputBorder.none,
-            focusedBorder: InputBorder.none,
-            disabledBorder: InputBorder.none,
-            focusedErrorBorder: InputBorder.none,
-          ),
-        ),
-      );
-    } else {
-      if (widget.title != null) {
-        input = widget.title;
-      } else {
-        final theme = Theme.of(context);
-        final textTheme = theme.textTheme;
-
-        final textStyle = hasQuery
-            ? style.queryStyle ?? textTheme.subtitle1
-            : style.hintStyle ??
-                textTheme.subtitle1.copyWith(color: theme.hintColor);
-
-        input = Text(
-          hasQuery ? query : widget.hint,
-          style: textStyle,
-          maxLines: 1,
-        );
-      }
-    }
-
-    return SingleChildScrollView(
-      padding: insets,
-      scrollDirection: Axis.horizontal,
-      child: Opacity(
-        opacity: opacity,
-        child: input,
-      ),
-    );
-  }
-
-  Widget _buildProgressBar() {
-    const progressBarHeight = 3.0;
-
-    final progressBarColor = accentColor ?? Theme.of(context).accentColor;
-    final showProgresBar = progress != null &&
-        (progress is num || (progress is bool && progress == true));
-    final progressValue =
-        progress is num ? progress.toDouble().clamp(0.0, 1.0) : null;
-
-    return Transform.translate(
-      offset: Offset(0, height - progressBarHeight),
-      child: AnimatedOpacity(
-        opacity: showProgresBar ? 1.0 : 0.0,
-        duration: const Duration(milliseconds: 150),
-        child: SizedBox(
-          height: progressBarHeight,
-          child: LinearProgressIndicator(
-            value: progressValue,
-            semanticsValue: progressValue,
-            backgroundColor: Colors.transparent,
-            valueColor: AlwaysStoppedAnimation(progressBarColor),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildBackdrop() {
     if (value == 0.0) return const SizedBox(height: 0);
 
@@ -1111,63 +951,10 @@ class FloatingSearchBarState extends State<_FloatingSearchBar>
     );
   }
 
-  List<Widget> _mapActions(List<Widget> actions) {
-    if (actions == null) return <Widget>[];
-
-    final animation = _queryToTitleAnimation;
-    final isOpen = _controller.value >= 0.5;
-
-    var openCount = 0;
-    var closedCount = 0;
-    for (final action in actions) {
-      if (action is FloatingSearchBarAction) {
-        if (action.showIfOpened) openCount++;
-        if (action.showIfClosed) closedCount++;
-      }
-    }
-
-    final currentActions = List<Widget>.from(actions)
-      ..removeWhere((action) {
-        if (action is FloatingSearchBarAction) {
-          return (isOpen && !action.showIfOpened) ||
-              (!isOpen && !action.showIfClosed);
-        } else {
-          return false;
-        }
-      });
-
-    return currentActions.map((action) {
-      if (action is FloatingSearchBarAction) {
-        if (action.isAlwaysShown) return action;
-
-        final index = currentActions.reversed.toList().indexOf(action);
-        final shouldScale = index <= ((isOpen ? closedCount : openCount) - 1);
-        if (shouldScale) {
-          return ScaleTransition(
-            scale: animation,
-            child: action,
-          );
-        } else {
-          return SizeFadeTransition(
-            animation: animation,
-            axis: Axis.horizontal,
-            axisAlignment: 1.0,
-            sizeFraction: 0.25,
-            child: Center(child: action),
-          );
-        }
-      }
-
-      return action;
-    }).toList();
-  }
-
   @override
   void dispose() {
-    queryListener.dispose();
     _barRebuilder.dispose();
     _controller.dispose();
-    _handler.cancel();
 
     if (widget.scrollController == null) {
       _scrollController?.dispose();
