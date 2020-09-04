@@ -331,6 +331,11 @@ class FloatingSearchAppBarExample extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FloatingSearchAppBar(
+      title: Text('Title'),
+      transitionDuration: Duration(milliseconds: 800),
+      showDrawerHamburger: false,
+      backgroundColor: Colors.greenAccent.shade100,
+      colorOnScroll: Colors.black,
       body: ListView.separated(
         padding: const EdgeInsets.only(top: kToolbarHeight),
         itemCount: 100,

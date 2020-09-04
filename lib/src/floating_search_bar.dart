@@ -556,9 +556,7 @@ class FloatingSearchBarState extends State<_FloatingSearchBar>
 
   bool get isOpen => barState?.isOpen ?? false;
   set isOpen(bool value) {
-    if (value == isOpen) return;
-    barState?.isOpen = value;
-
+    if (value != isOpen) barState?.isOpen = value;
     value ? _controller.forward() : _controller.reverse();
   }
 
@@ -796,15 +794,12 @@ class FloatingSearchBarState extends State<_FloatingSearchBar>
           ),
         );
 
-        return GestureDetector(
-          onTap: () => isOpen = !isOpen,
-          child: SlideTransition(
-            position: Tween(
-              begin: Offset.zero,
-              end: const Offset(0.0, -1.0),
-            ).animate(_translateAnimation),
-            child: container,
-          ),
+        return SlideTransition(
+          position: Tween(
+            begin: Offset.zero,
+            end: const Offset(0.0, -1.0),
+          ).animate(_translateAnimation),
+          child: container,
         );
       },
     );

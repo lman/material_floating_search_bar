@@ -20,6 +20,9 @@ class CircularButton extends StatelessWidget {
   /// `EdgeInsets.all(8)`.
   final EdgeInsets padding;
 
+  // ignore: public_member_api_docs
+  final String tooltip;
+
   /// Creates an easier to use [IconButton] for
   /// [FloatingSearchBar] actions.
   const CircularButton({
@@ -28,11 +31,12 @@ class CircularButton extends StatelessWidget {
     @required this.onPressed,
     this.size = 24.0,
     this.padding = const EdgeInsets.all(8),
+    this.tooltip,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Material(
+    Widget button = Material(
       type: MaterialType.transparency,
       child: InkWell(
         customBorder: const CircleBorder(),
@@ -43,5 +47,14 @@ class CircularButton extends StatelessWidget {
         ),
       ),
     );
+
+    if (tooltip != null) {
+      button = Tooltip(
+        message: tooltip ?? '',
+        child: button,
+      );
+    }
+
+    return button;
   }
 }
