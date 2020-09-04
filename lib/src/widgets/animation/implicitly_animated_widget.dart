@@ -1,13 +1,13 @@
-import 'package:flutter/material.dart';
-import 'package:meta/meta.dart';
+import 'package:flutter/material.dart'
+    hide ImplicitlyAnimatedWidget, ImplicitlyAnimatedWidgetState;
 
 // ignore_for_file: public_member_api_docs
 
 /// A base Widget for implicit animations.
-abstract class ImplicitAnimation extends StatefulWidget {
+abstract class ImplicitlyAnimatedWidget extends StatefulWidget {
   final Duration duration;
   final Curve curve;
-  const ImplicitAnimation(
+  const ImplicitlyAnimatedWidget(
     Key key,
     this.duration,
     this.curve,
@@ -15,17 +15,12 @@ abstract class ImplicitAnimation extends StatefulWidget {
         super(key: key);
 }
 
-abstract class ImplicitAnimationState<T, W extends ImplicitAnimation>
-    extends State<W> with SingleTickerProviderStateMixin {
+abstract class ImplicitlyAnimatedWidgetState<T, W extends ImplicitlyAnimatedWidget> extends State<W>
+    with TickerProviderStateMixin {
   AnimationController _controller;
-  AnimationController get controller => _controller;
 
   Animation<double> _animation;
-  Animation<double> get animation => _animation;
 
-  Duration get duration => widget.duration;
-
-  double get v => animation.value;
   T get newValue;
   T value;
   T oldValue;
@@ -34,17 +29,19 @@ abstract class ImplicitAnimationState<T, W extends ImplicitAnimation>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: duration,
+      duration: widget.duration,
       vsync: this,
     )..value = 1.0;
 
     _animation = CurvedAnimation(
       curve: widget.curve ?? Curves.linear,
-      parent: controller,
+      parent: _controller,
     );
 
-    animation.addListener(
-      () => value = lerp(oldValue, newValue, v),
+    _animation.addListener(
+      () => setState(
+        () => value = lerp(oldValue, newValue, _animation.value),
+      ),
     );
   }
 
@@ -60,41 +57,28 @@ abstract class ImplicitAnimationState<T, W extends ImplicitAnimation>
   void didUpdateWidget(W oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.duration != widget.duration) {
-      controller.duration = widget.duration;
+      _controller.duration = widget.duration;
     }
 
     if (oldWidget.curve != widget.curve) {
       _animation = CurvedAnimation(
         curve: widget.curve ?? Curves.linear,
-        parent: controller,
+        parent: _controller,
       );
     }
 
     if (value != newValue) {
       oldValue = value;
-      controller.reset();
-      controller.forward();
+      _controller.reset();
+      _controller.forward();
     }
   }
 
   T lerp(T a, T b, double t);
 
-  Widget builder(BuildContext context, T value);
-
-  @nonVirtual
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: animation,
-      builder: (context, child) {
-        return builder(context, value);
-      },
-    );
-  }
-
   @override
   void dispose() {
-    controller.dispose();
+    _controller.dispose();
     super.dispose();
   }
 }

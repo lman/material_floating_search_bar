@@ -28,8 +28,7 @@ class MaterialFloatingSearchBarExample extends StatelessWidget {
     return MaterialApp(
       title: 'Material Floating Search Bar Example',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        fontFamily: 'Montserrat',
+      theme: ThemeData.dark().copyWith(
         iconTheme: const IconThemeData(
           color: Color(0xFF4d4d4d),
         ),
@@ -96,7 +95,6 @@ class _HomeState extends State<Home> {
       builder: (context, model, _) {
         return FloatingSearchBar(
           controller: controller,
-          backgroundColor: Colors.white,
           clearQueryOnClose: true,
           hint: 'Search for a new Place...',
           iconColor: Colors.grey,
@@ -107,7 +105,7 @@ class _HomeState extends State<Home> {
           openAxisAlignment: 0.0,
           maxWidth: isPortrait ? 600 : 500,
           actions: actions,
-          progress: model.isLoading,
+          progress: true ,// model.isLoading,
           debounceDelay: const Duration(milliseconds: 500),
           onQueryChanged: model.onQueryChanged,
           transition: CircularFloatingSearchBarTransition(),
@@ -332,6 +330,7 @@ class FloatingSearchAppBarExample extends StatelessWidget {
   Widget build(BuildContext context) {
     return FloatingSearchAppBar(
       title: Text('Title'),
+      alwaysOpened: true,
       transitionDuration: Duration(milliseconds: 800),
       showDrawerHamburger: false,
       backgroundColor: Colors.greenAccent.shade100,

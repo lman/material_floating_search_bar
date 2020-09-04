@@ -141,7 +141,7 @@ class FloatingSearchBarAction extends StatefulWidget {
           onPressed: () {
             final bar = FloatingSearchAppBar.of(context);
 
-            if (bar.isOpen) {
+            if (bar.isOpen && !bar.isAlwaysOpened) {
               bar.close();
             } else if (canPop) {
               Navigator.pop(context);
