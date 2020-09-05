@@ -113,7 +113,7 @@ class FloatingSearchBarAction extends StatefulWidget {
                 if (!isEmpty) {
                   bar.clear();
                 } else {
-                  bar.isOpen = !bar.isOpen;
+                  bar.isOpen = !bar.isOpen || (!bar.hasFocus && bar.isAlwaysOpened);
                 }
               },
             );

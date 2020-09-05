@@ -12,45 +12,126 @@ typedef OnFocusChangedCallback = void Function(bool isFocused);
 /// This can be considered the base Widget for the full
 /// [FloatingSearchBar].
 class FloatingSearchAppBar extends ImplicitlyAnimatedWidget {
-  /// The widget displayed below the [FloatingSearchAppBar].
+  /// The widget displayed below the [FloatingSearchAppBar]
   final Widget body;
 
   // * --- Style properties --- *
 
+  /// The accent color used for example for the
+  /// progress indicator
   final Color accentColor;
-  final Color backgroundColor;
+
+  /// The background color of the AppBar
+  final Color color;
+
+  /// The color of the AppBar when a body scrollable
+  /// was scrolled (i.e. the [Scrollable] is not at the top)
   final Color colorOnScroll;
+
+  /// The shadow color for the elevation
   final Color shadowColor;
+
+  /// Can be used to override the `IconThemeDatas` color
   final Color iconColor;
+
+  /// The padding of the AppBar
   final EdgeInsetsGeometry padding;
+
+  /// The horizontal spacing between [startActions], the input
+  /// field and [actions]
   final EdgeInsetsGeometry insets;
+
+  /// The height of the AppBar
+  ///
+  /// Defaults to `56.0`
   final double height;
+
+  /// The elevation of the AppBar
   final double elevation;
+
+  /// The elevation of the AppBar when a child [Scrollable]
+  /// was scrolled (i.e. it's not at the top)
   final double liftOnScrollElevation;
+
+  /// The [TextStyle] for the hint of the input field
   final TextStyle hintStyle;
-  final TextStyle queryStyle;
+
+  /// The [TextStyle] for the title of the AppBar
+  final TextStyle titleStyle;
+
+  /// The [Brightness] that is used for adjusting the
+  /// status bar icon brightness.
+  ///
+  /// By default the brightness is dynamically calculated
+  /// based on the brightness of the [color] or
+  /// the [colorOnScroll] respectively.
   final Brightness brightness;
 
   // * --- Utility --- *
   final Widget bottom;
+
+  /// Whether the AppBar should be always in opened state.
+  ///
+  /// This is useful for example, if you have a page
+  /// dedicated for search.
   final bool alwaysOpened;
+
+  /// {@macro floating_search_bar.clearQueryOnClose}
   final bool clearQueryOnClose;
+
+  /// {@macro floating_search_bar.showDrawerHamburger}
   final bool showDrawerHamburger;
+
+  /// Hides the keyboard a child [Scrollable] was scrolled and
+  /// shows it again when the user scrolls to the top.
+  final bool hideKeyboardOnDownScroll;
+
+  /// {@macro floating_search_bar.progress}
   final dynamic progress;
+
+  /// {@macro floating_search_bar.transitionDuration}
   final Duration transitionDuration;
+
+  /// {@macro floating_search_bar.transitionCurve}
   final Curve transitionCurve;
+
+  /// {@macro floating_search_bar.debounceDelay}
   final Duration debounceDelay;
+
+  /// {@macro floating_search_bar.title}
   final Widget title;
+
+  /// {@macro floating_search_bar.hint}
   final String hint;
+
+  /// {@macro floating_search_bar.actions}
   final List<Widget> actions;
+
+  /// {@macro floating_search_bar.startActions}
   final List<Widget> startActions;
+
+  /// {@macro floating_search_bar.onQueryChanged}
   final OnQueryChangedCallback onQueryChanged;
+
+  /// {@macro floating_search_bar.onSubmitted}
   final OnQueryChangedCallback onSubmitted;
+
+  /// {@macro floating_search_bar.onFocusChanged}
   final OnFocusChangedCallback onFocusChanged;
+
+  /// {@macro floating_search_bar.controller}
   final FloatingSearchBarController controller;
+
+  /// {@macro floating_search_bar.textInputAction}
   final TextInputAction textInputAction;
+
+  /// {@macro floating_search_bar.textInputType}
   final TextInputType textInputType;
+
+  /// {@macro floating_search_bar.autocorrect}
   final bool autocorrect;
+
+  /// {@macro floating_search_bar.toolbarOptions}
   final ToolbarOptions toolbarOptions;
   const FloatingSearchAppBar({
     Key key,
@@ -58,7 +139,7 @@ class FloatingSearchAppBar extends ImplicitlyAnimatedWidget {
     Curve implicitCurve = Curves.linear,
     @required this.body,
     this.accentColor,
-    this.backgroundColor,
+    this.color,
     this.colorOnScroll,
     this.shadowColor,
     this.iconColor,
@@ -68,12 +149,13 @@ class FloatingSearchAppBar extends ImplicitlyAnimatedWidget {
     this.elevation = 0.0,
     this.liftOnScrollElevation = 4.0,
     this.hintStyle,
-    this.queryStyle,
+    this.titleStyle,
     this.brightness,
     this.bottom,
     this.alwaysOpened = false,
     this.clearQueryOnClose = true,
     this.showDrawerHamburger = true,
+    this.hideKeyboardOnDownScroll = false,
     this.progress = 0.0,
     this.transitionDuration = const Duration(milliseconds: 500),
     this.transitionCurve = Curves.easeOut,
@@ -113,6 +195,7 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
   Animation scrollAnimation;
 
   TextController _input;
+  bool _wasUnfocusedOnScroll = false;
   String get query => queryNotifer.value;
 
   bool _isAtTop = true;
@@ -165,17 +248,15 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
   bool get isOpen => _isOpen;
   set isOpen(bool value) {
     if (value) {
-      _input.requestFocus();
+      focus();
       controller.forward();
     } else {
-      _input.clearFocus(context);
+      unfocus();
 
       if (!widget.alwaysOpened) {
         controller.reverse();
       }
     }
-
-    setState(() {});
 
     if (widget.alwaysOpened) {
       _isOpen = true;
@@ -203,6 +284,7 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
       });
 
     controller = AnimationController(vsync: this, duration: transitionDuration)
+      ..value = isAlwaysOpened ? 1.0 : 0.0
       ..addListener(() => setState(() {}))
       ..addStatusListener((status) {
         _setInsets();
@@ -228,9 +310,8 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
     );
 
     if (isAlwaysOpened) {
-      controller.value = 1.0;
       _isOpen = true;
-      _input.requestFocus();
+      postFrame(_input.requestFocus);
     }
 
     _assignController();
@@ -239,6 +320,7 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
     _setInsets();
   }
 
@@ -259,6 +341,16 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
 
   void open() => isOpen = true;
   void close() => isOpen = false;
+
+  void focus() {
+    _wasUnfocusedOnScroll = false;
+    _input.requestFocus();
+  }
+
+  void unfocus() {
+    _wasUnfocusedOnScroll = false;
+    _input.clearFocus();
+  }
 
   void clear() => _input.clear();
 
@@ -313,6 +405,7 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
 
   Widget _buildAppBar() {
     final height = style.height + _statusBarHeight;
+    double prevPixels = 0.0;
 
     final brightness = widget.brightness ?? backgroundColor.computeLuminance() > 0.7
         ? Brightness.light
@@ -331,11 +424,24 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
           if (notification.metrics.axis != Axis.vertical) return false;
 
           final pixels = notification.metrics.pixels;
+
+          if (widget.hideKeyboardOnDownScroll) {
+            final isDown = pixels > prevPixels;
+            if (isDown && hasFocus) {
+              unfocus();
+              _wasUnfocusedOnScroll = true;
+            } else if (pixels <= 1.0 && _wasUnfocusedOnScroll && !hasFocus) {
+              focus();
+            }
+          }
+
           final isAtTop = pixels < 1.0;
           if (isAtTop != _isAtTop) {
             _isAtTop = isAtTop;
             isAtTop ? scrollController.reverse() : scrollController.forward();
           }
+
+          prevPixels = pixels;
 
           return false;
         },
@@ -529,7 +635,7 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
 
   Widget _buildProgressBar() {
     final progress = widget.progress;
-    const progressBarHeight = 3.0;
+    const progressBarHeight = 2.75;
 
     final progressBarColor = style.accentColor ?? Theme.of(context).accentColor;
     final showProgresBar =
@@ -570,7 +676,7 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
 
     return FloatingSearchAppBarStyle(
       accentColor: widget.accentColor ?? theme.accentColor,
-      backgroundColor: widget.backgroundColor ?? theme.cardColor ?? Colors.white,
+      backgroundColor: widget.color ?? theme.cardColor ?? Colors.white,
       iconColor: widget.iconColor ?? theme.iconTheme.color,
       colorOnScroll: widget.colorOnScroll ?? appBar.color,
       shadowColor: widget.shadowColor ?? appBar.shadowColor ?? Colors.black54,
@@ -589,7 +695,7 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
             end: hasActions ? 16 : 0,
           ).resolve(direction),
       hintStyle: widget.hintStyle,
-      queryStyle: widget.queryStyle,
+      queryStyle: widget.titleStyle,
     );
   }
 

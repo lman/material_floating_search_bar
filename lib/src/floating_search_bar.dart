@@ -26,9 +26,9 @@ typedef FloatingSearchBarBuilder = Widget Function(
 /// transitions similar to the ones used extensively
 /// by Google in their apps.
 class FloatingSearchBar extends ImplicitlyAnimatedWidget {
-  /// The widget displayed below the [FloatingSearchBar].
+  /// The widget displayed below the `FloatingSearchBar`.
   ///
-  /// This is useful, if the [FloatingSearchBar] should react
+  /// This is useful, if the `FloatingSearchBar` should react
   /// to scroll events (i.e. hide from view when a [Scrollable]
   /// is being scrolled down and show it again when scrolled up).
   final Widget body;
@@ -51,12 +51,12 @@ class FloatingSearchBar extends ImplicitlyAnimatedWidget {
   final Color shadowColor;
 
   /// When specified, overrides the themes icon color for
-  /// this [FloatingSearchBar], for example to easily adjust
+  /// this `FloatingSearchBar`, for example to easily adjust
   /// the icon color for all [actions] and [startActions].
   final Color iconColor;
 
   /// The color that fills the available space when the
-  /// [FloatingSearchBar] is opened.
+  /// `FloatingSearchBar` is opened.
   ///
   /// Typically a black-ish color.
   ///
@@ -65,9 +65,9 @@ class FloatingSearchBar extends ImplicitlyAnimatedWidget {
 
   /// The insets from the edges of its parent.
   ///
-  /// This can be used to position the [FloatingSearchBar].
+  /// This can be used to position the `FloatingSearchBar`.
   ///
-  /// If not specifed, the [FloatingSearchBar] will try to
+  /// If not specifed, the `FloatingSearchBar` will try to
   /// position itself at the top offsetted by
   /// `MediaQuery.of(context).viewPadding.top` to avoid
   /// the status bar.
@@ -95,14 +95,14 @@ class FloatingSearchBar extends ImplicitlyAnimatedWidget {
   /// * [shadowColor] to adjust the color of the shadow.
   final double elevation;
 
-  /// The max width of the [FloatingSearchBar].
+  /// The max width of the `FloatingSearchBar`.
   ///
-  /// By default the [FloatingSearchBar] will expand
+  /// By default the `FloatingSearchBar` will expand
   /// to fill all the available width. This value can
   /// be set to avoid this.
   final double maxWidth;
 
-  /// The max width of the [FloatingSearchBar] when opened.
+  /// The max width of the `FloatingSearchBar` when opened.
   ///
   /// This can be used, when the max width when opened should
   /// be different from the one specified by [maxWidth].
@@ -110,14 +110,14 @@ class FloatingSearchBar extends ImplicitlyAnimatedWidget {
   /// When not specified, will use the value of [maxWidth].
   final double openMaxWidth;
 
-  /// How the [FloatingSearchBar] should be aligned when the
+  /// How the `FloatingSearchBar` should be aligned when the
   /// available width is bigger than the width specified by [maxWidth].
   ///
   /// When not specified, defaults to `0.0` which centers
-  /// the [FloatingSearchBar].
+  /// the `FloatingSearchBar`.
   final double axisAlignment;
 
-  /// How the [FloatingSearchBar] should be aligned when the
+  /// How the `FloatingSearchBar` should be aligned when the
   /// available width is bigger than the width specified by [openMaxWidth].
   ///
   /// When not specified, will use the value of [axisAlignment].
@@ -138,91 +138,117 @@ class FloatingSearchBar extends ImplicitlyAnimatedWidget {
   final TextStyle queryStyle;
 
   // * --- Utility --- *
+  /// {@template floating_search_bar.clearQueryOnClose}
   /// Whether the current query should be cleared when
-  /// the [FloatingSearchBar] was closed.
+  /// the `FloatingSearchBar` was closed.
   ///
   /// When not specifed, defaults to `true`.
+  /// {@endtemplate}
   final bool clearQueryOnClose;
 
+  /// {@template floating_search_bar.showDrawerHamburger}
   /// Whether a hamburger menu should be shown when
   /// there is a [Scaffold] with a [Drawer] in the widget
   /// tree.
   ///
   /// When not specified, defaults to `true`.
+  /// {@endtemplate}
   final bool showDrawerHamburger;
 
-  /// Whether the [FloatingSearchBar] should be closed when
+  /// Whether the `FloatingSearchBar` should be closed when
   /// the backdrop was tapped.
   ///
   /// When not specified, defaults to `true`.
   final bool closeOnBackdropTap;
 
-  /// The progress of the [LinearProgressIndicator] inside the card.
+  /// {@template floating_search_bar.progress}
+  /// The progress of the [LinearProgressIndicator] inside the bar.
   ///
   /// When set to a `double` between [0..1], will show
   /// show a determined [LinearProgressIndicator].
   ///
-  /// When set to `true`, the [FloatingSearchBar] will
+  /// When set to `true`, the `FloatingSearchBar` will
   /// show an indetermined [LinearProgressIndicator].
   ///
   /// When `null` or `false`, will hide the [LinearProgressIndicator].
+  /// {@endtemplate}
   final dynamic progress;
 
+  /// {@template floating_search_bar.transitionDuration}
   /// The duration of the animation between opened and closed
   /// state.
+  /// {@endtemplate}
   final Duration transitionDuration;
 
+  /// {@template floating_search_bar.transitionCurve}
   /// The curve for the animation between opened and closed
   /// state.
+  /// {@endtemplate}
   final Curve transitionCurve;
 
+  /// {@template floating_search_bar.debounceDelay}
   /// The delay between the time the user stopped typing
   /// and the invocation of the [onQueryChanged] callback.
   ///
   /// This is useful for example if you want to avoid doing
   /// expensive tasks, such as making a network call, for every
   /// single character.
+  /// {@endtemplate}
   final Duration debounceDelay;
 
+  /// {@template floating_search_bar.title}
   /// A widget that is shown in place of the [TextField] when the
-  /// [FloatingSearchBar] is closed.
+  /// `FloatingSearchBar` is closed.
+  /// {@endtemplate}
   final Widget title;
 
+  /// {@template floating_search_bar.hint}
   /// The text value of the hint of the [TextField].
+  /// {@endtemplate}
   final String hint;
 
+  /// {@template floating_search_bar.actions}
   /// A list of widgets displayed in a row after the [TextField].
   ///
   /// Consider using [FloatingSearchBarAction]s for more advanced
-  /// actions that can interact with the [FloatingSearchBar].
+  /// actions that can interact with the `FloatingSearchBar`.
   ///
   /// In LTR languages, they will be displayed to the left of
   /// the [TextField].
+  /// {@endtemplate}
   final List<Widget> actions;
 
+  /// {@template floating_search_bar.startActions}
   /// A list of widgets displayed in a row before the [TextField].
   ///
   /// Consider using [FloatingSearchBarAction]s for more advanced
-  /// actions that can interact with the [FloatingSearchBar].
+  /// actions that can interact with the `FloatingSearchBar`.
   ///
   /// In LTR languages, they will be displayed to the right of
   /// the [TextField].
+  /// {@endtemplate}
   final List<Widget> startActions;
 
+  /// {@template floating_search_bar.onQueryChanged}
   /// A callback that gets invoked when the input of
   /// the query inside the [TextField] changed.
   ///
   /// See also:
   ///   * [debounceDelay] to delay the invocation of the callback
   ///   until the user stopped typing.
+  /// {@endtemplate}
   final OnQueryChangedCallback onQueryChanged;
 
+  /// {@template floating_search_bar.onSubmitted}
   /// A callback that gets invoked when the user submitted
   /// their query (e.g. hit the search button).
+  /// {@endtemplate}
   final OnQueryChangedCallback onSubmitted;
 
-  /// A callback that gets invoked when the [FloatingSearchBar]
+  /// {@template floating_search_bar.onFocusChanged}
+  /// A callback that gets invoked when the `FloatingSearchBar`
   /// receives or looses focus.
+  /// {@endtemplate}
   final OnFocusChangedCallback onFocusChanged;
 
   /// The transition to be used for animating between closed
@@ -239,45 +265,55 @@ class FloatingSearchBar extends ImplicitlyAnimatedWidget {
   ///    child.
   final FloatingSearchBarTransition transition;
 
-  /// The builder for the body of this [FloatingSearchBar].
+  /// The builder for the body of this `FloatingSearchBar`.
   ///
   /// Usually, a list of items. Note that unless [isScrollControlled]
-  /// is set to `true`, the body of a [FloatingSearchBar] must not
+  /// is set to `true`, the body of a `FloatingSearchBar` must not
   /// have an unbounded height meaning that `shrinkWrap` should be set
   /// to `true` on all [Scrollable]s.
   final FloatingSearchBarBuilder builder;
 
-  /// The controller for this [FloatingSearchBar] which can be used
-  /// to programatically open, close, show or hide the [FloatingSearchBar].
+  /// {@template floating_search_bar.controller}
+  /// The controller for this `FloatingSearchBar` which can be used
+  /// to programatically open, close, show or hide the `FloatingSearchBar`.
+  /// {@endtemplate}
   final FloatingSearchBarController controller;
 
+  /// {@template floating_search_bar.textInputAction}
   /// The [TextInputAction] to be used by the [TextField]
-  /// of this [FloatingSearchBar].
+  /// of this `FloatingSearchBar`.
+  /// {@endtemplate}
   final TextInputAction textInputAction;
 
+  /// {@template floating_search_bar.textInputType}
   /// The [TextInputType] of the [TextField]
-  /// of this [FloatingSearchBar].
+  /// of this `FloatingSearchBar`.
+  /// {@endtemplate}
   final TextInputType textInputType;
 
+  /// {@template floating_search_bar.autocorrect}
   /// Enable or disable autocorrection of the [TextField] of
-  /// this [FloatingSearchBar].
+  /// this `FloatingSearchBar`.
+  /// {@endtemplate}
   final bool autocorrect;
 
+  /// {@template floating_search_bar.toolbarOptions}
   /// The [ToolbarOptions] of the [TextField] of
-  /// this [FloatingSearchBar].
+  /// this `FloatingSearchBar`.
+  /// {@endtemplate}
   final ToolbarOptions toolbarOptions;
 
-  /// Hides the [FloatingSearchBar] intially for the specified
+  /// Hides the `FloatingSearchBar` intially for the specified
   /// duration and then translates it from the top to its position.
   ///
   /// This can be used as a simple enrance animation.
   final Duration showAfter;
 
   // * --- Scrolling --- *
-  /// Whether the body of this [FloatingSearchBar] is using its
+  /// Whether the body of this `FloatingSearchBar` is using its
   /// own [Scrollable].
   ///
-  /// This will allow the body of the [FloatingSearchBar] to have an
+  /// This will allow the body of the `FloatingSearchBar` to have an
   /// unbounded height.
   ///
   ///
@@ -286,15 +322,15 @@ class FloatingSearchBar extends ImplicitlyAnimatedWidget {
   final bool isScrollControlled;
 
   /// The [ScrollPhysics] of the [SingleChildScrollView] for the body of
-  /// this [FloatingSearchBar].
+  /// this `FloatingSearchBar`.
   final ScrollPhysics physics;
 
   /// The [ScrollController] of the [SingleChildScrollView] for the body of
-  /// this [FloatingSearchBar].
+  /// this `FloatingSearchBar`.
   final ScrollController scrollController;
 
   /// The [EdgeInsets] of the [SingleChildScrollView] for the body of
-  /// this [FloatingSearchBar].
+  /// this `FloatingSearchBar`.
   final EdgeInsets scrollPadding;
   const FloatingSearchBar({
     Key key,
@@ -670,7 +706,7 @@ class FloatingSearchBarState
       height: 1000,
       elevation: 0.0,
       controller: widget.controller,
-      backgroundColor: transition.lerpBackgroundColor(),
+      color: transition.lerpBackgroundColor(),
       onFocusChanged: (isFocused) {
         isOpen = isFocused;
         widget.onFocusChanged?.call(isFocused);
@@ -698,7 +734,7 @@ class FloatingSearchBarState
       iconColor: widget.iconColor,
       insets: style.insets,
       padding: style.padding,
-      queryStyle: widget.queryStyle,
+      titleStyle: widget.queryStyle,
       shadowColor: style.shadowColor,
     );
 

@@ -41,14 +41,16 @@ class TextController extends TextEditingController {
   /// Request focus for the [FocusNode] wrapped by this
   /// [TextController].
   void requestFocus() {
-    _node = FocusNode();
     _node.requestFocus();
   }
 
   /// Cleares the focus of the [FocusNode] wrapped by this
   /// [TextController].
-  void clearFocus(BuildContext context) =>
-      FocusScope.of(context).requestFocus(FocusNode());
+  void clearFocus() {
+    _node.unfocus(
+      disposition: UnfocusDisposition.previouslyFocusedChild,
+    );
+  }
 
   /// Whether the [FocusNode] wrapped by this
   /// [TextController] is currenty focused.
