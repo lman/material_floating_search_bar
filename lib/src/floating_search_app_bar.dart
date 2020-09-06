@@ -243,6 +243,7 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
   }
 
   bool get hasFocus => _input.hasFocus;
+  set hasFocus(bool value) => value ? focus() : unfocus();
 
   bool _isOpen = false;
   bool get isOpen => _isOpen;
@@ -274,13 +275,15 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
     super.initState();
     _input = TextController()
       ..addListener(() {
-        queryNotifer.value = _input.text;
+        if (_input.text != queryNotifer.value) {
+          queryNotifer.value = _input.text;
 
-        _handler.post(
-          // Do not add a delay when the query is empty.
-          _input.text.isEmpty ? Duration.zero : widget.debounceDelay,
-          () => widget.onQueryChanged?.call(_input.text),
-        );
+          _handler.post(
+            // Do not add a delay when the query is empty.
+            _input.text.isEmpty ? Duration.zero : widget.debounceDelay,
+            () => widget.onQueryChanged?.call(_input.text),
+          );
+        }
       });
 
     controller = AnimationController(vsync: this, duration: transitionDuration)
@@ -469,7 +472,7 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
     final bar = GestureDetector(
       onTap: () {
         if (isOpen) {
-          isOpen = query.isNotEmpty || !hasFocus;
+          hasFocus = !hasFocus;
           _input.moveCursorToEnd();
         } else if (!isAppBar) {
           isOpen = true;
