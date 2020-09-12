@@ -242,14 +242,11 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
     return leading != null ? <Widget>[leading, ...actions] : actions;
   }
 
-  bool get hasFocus => _input.hasFocus;
-  set hasFocus(bool value) => value ? focus() : unfocus();
-
   bool _isOpen = false;
   bool get isOpen => _isOpen;
   set isOpen(bool value) {
     if (value) {
-      focus();
+      post(transitionDuration, focus);
       controller.forward();
     } else {
       unfocus();
@@ -269,6 +266,9 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
       widget.onFocusChanged?.call(isOpen);
     }
   }
+
+  bool get hasFocus => _input.hasFocus;
+  set hasFocus(bool value) => value ? focus() : unfocus();
 
   @override
   void initState() {

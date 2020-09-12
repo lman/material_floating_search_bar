@@ -796,7 +796,7 @@ class FloatingSearchBarState
       child: Container(
         constraints: maxWidth != null
             ? BoxConstraints(
-                maxWidth: maxWidth + transition.lerpMargin().horizontal,
+                maxWidth: transition.lerpMaxWidth() + transition.lerpMargin().horizontal,
               )
             : null,
         child: body,
