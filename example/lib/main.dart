@@ -28,7 +28,7 @@ class MaterialFloatingSearchBarExample extends StatelessWidget {
     return MaterialApp(
       title: 'Material Floating Search Bar Example',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(
+      theme: ThemeData.light().copyWith(
         iconTheme: const IconThemeData(
           color: Color(0xFF4d4d4d),
         ),
@@ -52,6 +52,8 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  final controller = FloatingSearchBarController();
+
   int _index = 0;
   int get index => _index;
   set index(int value) {
@@ -59,8 +61,6 @@ class _HomeState extends State<Home> {
     _index == 2 ? controller.hide() : controller.show();
     setState(() {});
   }
-
-  final controller = FloatingSearchBarController();
 
   @override
   Widget build(BuildContext context) {
@@ -253,6 +253,12 @@ class _HomeState extends State<Home> {
         ),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 }
 

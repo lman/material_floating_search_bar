@@ -196,7 +196,6 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
 
   TextController _input;
   bool _wasUnfocusedOnScroll = false;
-  String get query => queryNotifer.value;
 
   bool _isAtTop = true;
   bool get isAtTop => _isAtTop;
@@ -269,6 +268,9 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
 
   bool get hasFocus => _input.hasFocus;
   set hasFocus(bool value) => value ? focus() : unfocus();
+
+  String get query => _input.text;
+  set query(String value) => _input.text = value;
 
   @override
   void initState() {
@@ -358,12 +360,7 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
   void clear() => _input.clear();
 
   void _assignController() {
-    final controller = widget.controller;
-    if (controller == null) return;
-
-    controller._open = open;
-    controller._close = close;
-    controller._clear = clear;
+    widget.controller?._appBarState = this;
   }
 
   EdgeInsets insets;

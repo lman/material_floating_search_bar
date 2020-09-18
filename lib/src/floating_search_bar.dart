@@ -518,11 +518,7 @@ class FloatingSearchBarState
   }
 
   void _assignController() {
-    final controller = widget.controller;
-    if (controller == null) return;
-
-    controller._show = show;
-    controller._hide = hide;
+    widget.controller._searchBarState = this;
   }
 
   void show() => isVisible = true;
@@ -875,52 +871,50 @@ class FloatingSearchBarController {
   /// Creates a controller for a [FloatingSearchBar].
   FloatingSearchBarController();
 
-  FloatingSearchBarState _state;
+  FloatingSearchAppBarState _appBarState;
+  FloatingSearchBarState _searchBarState;
 
   /// Opens/Expands the [FloatingSearchBar].
-  void open() => _open?.call();
-  VoidCallback _open;
+  void open() => _appBarState?.open();
 
   /// Closes/Collapses the [FloatingSearchBar].
-  void close() => _close?.call();
-  VoidCallback _close;
-
-  /// Cleares the current query.
-  void clear() => _clear?.call();
-  VoidCallback _clear;
+  void close() => _appBarState?.close();
 
   /// Visually reveals the [FloatingSearchBar] when
   /// it was previously hidden via [hide].
-  void show() => _show?.call();
-  VoidCallback _show;
+  void show() => _searchBarState?.show();
 
   /// Visually hides the [FloatingSearchBar].
-  void hide() => _hide?.call();
-  VoidCallback _hide;
+  void hide() => _searchBarState?.hide();
+
+  /// Sets the query of the input of the [FloatingSearchBar].
+  set query(String query) => _appBarState.query = query;
+
+  /// The current query of the [FloatingSearchBar].
+  String get query => _appBarState.query;
+
+  /// Cleares the current query.
+  void clear() => _appBarState?.clear();
 
   /// Whether the [FloatingSearchBar] is currently
   /// opened/expanded.
-  bool get isOpen => _state?.isOpen == true;
+  bool get isOpen => _appBarState?.isOpen == true;
 
   /// Whether the [FloatingSearchBar] is currently
   /// closed/collapsed.
-  bool get isClosed => _state?.isOpen == false;
+  bool get isClosed => _appBarState?.isOpen == false;
 
   /// Whether the [FloatingSearchBar] is currently
   /// not hidden.
-  bool get isVisible => _state?.isVisible == true;
+  bool get isVisible => _searchBarState?.isVisible == true;
 
   /// Whether the [FloatingSearchBar] is currently
   /// not visible.
-  bool get isHidden => _state?.isVisible == false;
+  bool get isHidden => _searchBarState?.isVisible == false;
 
   /// Disposes this controller.
   void dispose() {
-    _open = null;
-    _close = null;
-    _clear = null;
-    _show = null;
-    _hide = null;
-    _state = null;
+    _searchBarState = null;
+    _appBarState = null;
   }
 }
