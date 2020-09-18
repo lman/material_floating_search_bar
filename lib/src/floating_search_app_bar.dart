@@ -21,10 +21,10 @@ class FloatingSearchAppBar extends ImplicitlyAnimatedWidget {
   /// progress indicator
   final Color accentColor;
 
-  /// The background color of the AppBar
+  /// The background color of the bar
   final Color color;
 
-  /// The color of the AppBar when a [Scrollable]
+  /// The color of the bar when a [Scrollable]
   /// inside the [body] was scrolled (i.e. is not at the top)
   final Color colorOnScroll;
 
@@ -34,29 +34,29 @@ class FloatingSearchAppBar extends ImplicitlyAnimatedWidget {
   /// Can be used to override the `IconThemeDatas` color
   final Color iconColor;
 
-  /// The padding of the AppBar
+  /// The padding of the bar
   final EdgeInsetsGeometry padding;
 
   /// The horizontal spacing between [startActions], the input
   /// field and [actions]
   final EdgeInsetsGeometry insets;
 
-  /// The height of the AppBar
+  /// The height of the bar
   ///
   /// Defaults to `56.0`
   final double height;
 
-  /// The elevation of the AppBar
+  /// The elevation of the bar
   final double elevation;
 
-  /// The elevation of the AppBar when a [Scrollable]
+  /// The elevation of the bar when a [Scrollable]
   /// inside the [body] was scrolled (i.e. it's not at the top)
   final double liftOnScrollElevation;
 
   /// The [TextStyle] for the hint of the input field
   final TextStyle hintStyle;
 
-  /// The [TextStyle] for the title of the AppBar
+  /// The [TextStyle] for the title of the bar
   final TextStyle titleStyle;
 
   /// The [Brightness] that is used for adjusting the
@@ -70,7 +70,7 @@ class FloatingSearchAppBar extends ImplicitlyAnimatedWidget {
   // * --- Utility --- *
   final Widget bottom;
 
-  /// Whether the AppBar should be always in opened state.
+  /// Whether the bar should be always in opened state.
   ///
   /// This is useful for example, if you have a page
   /// dedicated for search.
@@ -212,14 +212,14 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
   Color get accentColor => style.accentColor;
   Color get iconColor => style.iconColor;
   Color get shadowColor => style.shadowColor;
-  Color get backgroundColor =>
-      Color.lerp(style.backgroundColor, style.colorOnScroll, scrollAnimation.value);
+  Color get backgroundColor => Color.lerp(
+      style.backgroundColor, style.colorOnScroll, scrollAnimation.value);
 
   bool get hasActions => actions.isNotEmpty;
   List<Widget> get actions {
     final actions = widget.actions ?? [FloatingSearchBarAction.searchToClear()];
-    final showHamburger =
-        widget.showDrawerHamburger && (Scaffold.of(context)?.hasEndDrawer ?? false);
+    final showHamburger = widget.showDrawerHamburger &&
+        (Scaffold.of(context)?.hasEndDrawer ?? false);
     return showHamburger
         ? <Widget>[...actions, FloatingSearchBarAction.hamburgerToBack()]
         : actions;
@@ -228,14 +228,15 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
   bool get hasStartActions => startActions.isNotEmpty;
   List<Widget> get startActions {
     final actions = widget.startActions ?? const <Widget>[];
-    final showHamburger =
-        widget.showDrawerHamburger && (Scaffold.of(context)?.hasDrawer ?? false);
+    final showHamburger = widget.showDrawerHamburger &&
+        (Scaffold.of(context)?.hasDrawer ?? false);
 
     Widget leading;
     if (showHamburger) {
       leading = FloatingSearchBarAction.hamburgerToBack();
     } else if (Navigator.canPop(context) || widget.body != null) {
-      leading = FloatingSearchBarAction.back(showIfClosed: Navigator.canPop(context));
+      leading =
+          FloatingSearchBarAction.back(showIfClosed: Navigator.canPop(context));
     }
 
     return leading != null ? <Widget>[leading, ...actions] : actions;
@@ -407,9 +408,10 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
     final height = style.height + _statusBarHeight;
     double prevPixels = 0.0;
 
-    final brightness = widget.brightness ?? backgroundColor.computeLuminance() > 0.7
-        ? Brightness.light
-        : Brightness.dark;
+    final brightness =
+        widget.brightness ?? backgroundColor.computeLuminance() > 0.7
+            ? Brightness.light
+            : Brightness.dark;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: brightness == Brightness.dark
@@ -506,7 +508,8 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
   }
 
   Widget _buildInputAndActions() {
-    final iconTheme = Theme.of(context).iconTheme.copyWith(color: style.iconColor);
+    final iconTheme =
+        Theme.of(context).iconTheme.copyWith(color: style.iconColor);
 
     return Row(
       children: [
@@ -562,7 +565,8 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
     final showTitle = widget.title != null || (!hasQuery && query.isNotEmpty);
     final opacity = showTitle ? animation.value : 1.0;
 
-    final showTextInput = showTitle ? controller.value > 0.5 : controller.value > 0.0;
+    final showTextInput =
+        showTitle ? controller.value > 0.5 : controller.value > 0.0;
 
     Widget input;
     if (showTextInput) {
@@ -613,7 +617,8 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
 
         final textStyle = hasQuery
             ? style.queryStyle ?? textTheme.subtitle1
-            : style.hintStyle ?? textTheme.subtitle1.copyWith(color: theme.hintColor);
+            : style.hintStyle ??
+                textTheme.subtitle1.copyWith(color: theme.hintColor);
 
         input = Text(
           hasQuery ? query : widget.hint,
@@ -638,9 +643,10 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
     const progressBarHeight = 2.75;
 
     final progressBarColor = style.accentColor ?? Theme.of(context).accentColor;
-    final showProgresBar =
-        progress != null && (progress is num || (progress is bool && progress == true));
-    final progressValue = progress is num ? progress.toDouble().clamp(0.0, 1.0) : null;
+    final showProgresBar = progress != null &&
+        (progress is num || (progress is bool && progress == true));
+    final progressValue =
+        progress is num ? progress.toDouble().clamp(0.0, 1.0) : null;
 
     return AnimatedOpacity(
       opacity: showProgresBar ? 1.0 : 0.0,
