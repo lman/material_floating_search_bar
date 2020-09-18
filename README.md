@@ -214,5 +214,5 @@ In addition to most of the fields from the `FloatingSearchBar`, `FloatingSearchA
 | --------------------------- | ----------------------- |
 | `colorOnScroll`                   | The color of the bar when a `Scrollable` inside the `body` was scrolled (i.e. the `Scrollable` is not at the top)
 | `liftOnScrollElevation`           | The elevation of the bar when a `Scrollable` inside the `body` was scrolled (i.e. the `Scrollable` is not at the top)
-| `alwaysOpened`                      | Whether the bar should be always in opened state.<br><br>This is useful for example, if you have a page dedicated for search.
+| `alwaysOpened`                      | Whether the bar should be always in opened state.<br><br>This is useful for example, if you have a page dedicated only for search.
 | `hideKeyboardOnDownScroll`           | Hides the keyboard a `Scrollable` inside the `body` was scrolled and shows it again when the user scrolls to the top.

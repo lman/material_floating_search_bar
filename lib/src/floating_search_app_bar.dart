@@ -73,7 +73,7 @@ class FloatingSearchAppBar extends ImplicitlyAnimatedWidget {
   /// Whether the bar should be always in opened state.
   ///
   /// This is useful for example, if you have a page
-  /// dedicated for search.
+  /// dedicated only for search.
   final bool alwaysOpened;
 
   /// {@macro floating_search_bar.clearQueryOnClose}
