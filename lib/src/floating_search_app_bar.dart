@@ -24,8 +24,8 @@ class FloatingSearchAppBar extends ImplicitlyAnimatedWidget {
   /// The background color of the AppBar
   final Color color;
 
-  /// The color of the AppBar when a body scrollable
-  /// was scrolled (i.e. the [Scrollable] is not at the top)
+  /// The color of the AppBar when a [Scrollable]
+  /// inside the [body] was scrolled (i.e. is not at the top)
   final Color colorOnScroll;
 
   /// The shadow color for the elevation
@@ -49,8 +49,8 @@ class FloatingSearchAppBar extends ImplicitlyAnimatedWidget {
   /// The elevation of the AppBar
   final double elevation;
 
-  /// The elevation of the AppBar when a child [Scrollable]
-  /// was scrolled (i.e. it's not at the top)
+  /// The elevation of the AppBar when a [Scrollable]
+  /// inside the [body] was scrolled (i.e. it's not at the top)
   final double liftOnScrollElevation;
 
   /// The [TextStyle] for the hint of the input field
@@ -82,7 +82,7 @@ class FloatingSearchAppBar extends ImplicitlyAnimatedWidget {
   /// {@macro floating_search_bar.showDrawerHamburger}
   final bool showDrawerHamburger;
 
-  /// Hides the keyboard a child [Scrollable] was scrolled and
+  /// Hides the keyboard a [Scrollable] inside the [body] was scrolled and
   /// shows it again when the user scrolls to the top.
   final bool hideKeyboardOnDownScroll;
 

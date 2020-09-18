@@ -113,7 +113,8 @@ class FloatingSearchBarAction extends StatefulWidget {
                 if (!isEmpty) {
                   bar.clear();
                 } else {
-                  bar.isOpen = !bar.isOpen || (!bar.hasFocus && bar.isAlwaysOpened);
+                  bar.isOpen =
+                      !bar.isOpen || (!bar.hasFocus && bar.isAlwaysOpened);
                 }
               },
             );
@@ -177,7 +178,8 @@ class FloatingSearchBarAction extends StatefulWidget {
   }
 
   @override
-  _FloatingSearchBarActionState createState() => _FloatingSearchBarActionState();
+  _FloatingSearchBarActionState createState() =>
+      _FloatingSearchBarActionState();
 }
 
 class _FloatingSearchBarActionState extends State<FloatingSearchBarAction> {
@@ -207,7 +209,8 @@ class FloatingSearchActionBar extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _FloatingSearchActionBarState createState() => _FloatingSearchActionBarState();
+  _FloatingSearchActionBarState createState() =>
+      _FloatingSearchActionBarState();
 }
 
 class _FloatingSearchActionBarState extends State<FloatingSearchActionBar> {
@@ -244,7 +247,8 @@ class _FloatingSearchActionBarState extends State<FloatingSearchActionBar> {
     final currentActions = List<Widget>.from(actions)
       ..removeWhere((action) {
         if (action is FloatingSearchBarAction) {
-          return (isOpen && !action.showIfOpened) || (!isOpen && !action.showIfClosed);
+          return (isOpen && !action.showIfOpened) ||
+              (!isOpen && !action.showIfClosed);
         } else {
           return false;
         }

@@ -105,7 +105,7 @@ class _HomeState extends State<Home> {
           openAxisAlignment: 0.0,
           maxWidth: isPortrait ? 600 : 500,
           actions: actions,
-          progress: true, // model.isLoading,
+          progress: model.isLoading,
           debounceDelay: const Duration(milliseconds: 500),
           onQueryChanged: model.onQueryChanged,
           transition: CircularFloatingSearchBarTransition(),
@@ -336,14 +336,11 @@ class FloatingSearchAppBarExample extends StatelessWidget {
   Widget build(BuildContext context) {
     return FloatingSearchAppBar(
       title: Text('Title'),
-      alwaysOpened: true,
       transitionDuration: Duration(milliseconds: 800),
-      showDrawerHamburger: false,
       color: Colors.greenAccent.shade100,
-      colorOnScroll: Colors.black,
-      progress: 0.75,
+      colorOnScroll: Colors.greenAccent.shade200,
       body: ListView.separated(
-        padding: const EdgeInsets.only(top: kToolbarHeight),
+        padding: EdgeInsets.zero,
         itemCount: 100,
         separatorBuilder: (context, index) => const Divider(),
         itemBuilder: (context, index) {
