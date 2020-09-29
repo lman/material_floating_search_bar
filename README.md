@@ -202,7 +202,7 @@ class MyAwesomePage extends StatelessWidget {
 
 ## Floating Search App Bar
 
-Sometimes a `FloatingSearchBar` might not be the most appriopriate search method for you're use case. For this reason there is also the `FloatingSearchAppBar`. It is a normal `AppBar` with easy search integration very similar to the normal `FloatingSearchBar`. 
+Sometimes a `FloatingSearchBar` might not be the most appriopriate search method for your use case. For this reason there is also the `FloatingSearchAppBar`. It is a normal `AppBar` with easy search integration very similar to the normal `FloatingSearchBar`. 
 
 <img width="312px" alt="FloatingSearchAppBar example" src="https://raw.githubusercontent.com/bnxm/material_floating_search_bar/master/assets/floating_search_app_bar_demo.png"/>
 
