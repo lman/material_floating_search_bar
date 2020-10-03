@@ -142,7 +142,6 @@ class _HomeState extends State<Home> {
       child: ImplicitlyAnimatedList<Place>(
         shrinkWrap: true,
         items: model.suggestions.take(6).toList(),
-        physics: const NeverScrollableScrollPhysics(),
         areItemsTheSame: (a, b) => a == b,
         itemBuilder: (context, animation, place, i) {
           return SizeFadeTransition(
