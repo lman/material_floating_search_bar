@@ -141,6 +141,7 @@ class _HomeState extends State<Home> {
       borderRadius: BorderRadius.circular(8),
       child: ImplicitlyAnimatedList<Place>(
         shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
         items: model.suggestions.take(6).toList(),
         areItemsTheSame: (a, b) => a == b,
         itemBuilder: (context, animation, place, i) {
