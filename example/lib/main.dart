@@ -54,6 +54,12 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final controller = FloatingSearchBarController();
 
+  @override
+  void initState() {
+    super.initState();
+    controller.query = 'ksljflkd';
+  }
+
   int _index = 0;
   int get index => _index;
   set index(int value) {

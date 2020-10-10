@@ -897,10 +897,16 @@ class FloatingSearchBarController {
   void hide() => _searchBarState?.hide();
 
   /// Sets the query of the input of the [FloatingSearchBar].
-  set query(String query) => _appBarState.query = query;
+  set query(String query) {
+    if (_appBarState == null) {
+      postFrame(() => _appBarState?.query = query);
+    } else {
+      _appBarState?.query = query;
+    }
+  }
 
   /// The current query of the [FloatingSearchBar].
-  String get query => _appBarState.query;
+  String get query => _appBarState?.query;
 
   /// Cleares the current query.
   void clear() => _appBarState?.clear();
