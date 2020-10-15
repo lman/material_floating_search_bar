@@ -336,8 +336,8 @@ class FloatingSearchAppBarExample extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FloatingSearchAppBar(
-      title: Text('Title'),
-      transitionDuration: Duration(milliseconds: 800),
+      title: const Text('Title'),
+      transitionDuration: const Duration(milliseconds: 800),
       color: Colors.greenAccent.shade100,
       colorOnScroll: Colors.greenAccent.shade200,
       body: ListView.separated(
