@@ -133,7 +133,7 @@ There are many customization options:
 | `clearQueryOnClose`         | Whether the current query should be cleared when the `FloatingSearchBar` was closed. <br><br> When not specifed, defaults to `true`.
 | `showDrawerHamburger`       | Whether a hamburger menu should be shown when there is a `Scaffold` with a `Drawer` in the widget tree.
 | `closeOnBackdropTap`        | Whether the `FloatingSearchBar` should be closed when the backdrop was tapped. <br><br> When not specified, defaults to `true`.
-| `showLeadingBack`           | Whether to determine and show the leading back button automatically.<br><br> When not specified, defaults to `true`.
+| `hideLeadingBack`           | Whether to hide the leading back button completely.<br><br> When not specified, defaults to `false`.
 | `progress`                  | The progress of the `LinearProgressIndicator` inside the card. <br><br> When set to a `double` between `0..1`, will show show a determined `LinearProgressIndicator`. <br><br> When set to `true`, the `FloatingSearchBar` will show an indetermined `LinearProgressIndicator`. <br><br> When `null` or `false`, will hide the `LinearProgressIndicator`.
 | `transitionDuration`       |  The duration of the animation between opened and closed state.
 | `transitionCurve`          |  The curve for the animation between opened and closed state.

@@ -161,10 +161,10 @@ class FloatingSearchBar extends ImplicitlyAnimatedWidget {
   /// When not specified, defaults to `true`.
   final bool closeOnBackdropTap;
 
-  /// Whether to determine and show the leading back button automatically.
+  /// Whether to hide the leading back button completely.
   ///
-  /// When not specified, defaults to `true`.
-  final bool showLeadingBack;
+  /// When not specified, defaults to `false`.
+  final bool hideLeadingBack;
 
   /// {@template floating_search_bar.progress}
   /// The progress of the [LinearProgressIndicator] inside the bar.
@@ -363,7 +363,7 @@ class FloatingSearchBar extends ImplicitlyAnimatedWidget {
     this.clearQueryOnClose = true,
     this.showDrawerHamburger = true,
     this.closeOnBackdropTap = true,
-    this.showLeadingBack = true,
+    this.hideLeadingBack = false,
     this.progress = false,
     this.transitionDuration = const Duration(milliseconds: 500),
     this.transitionCurve = Curves.ease,
@@ -729,7 +729,7 @@ class FloatingSearchBarState extends ImplicitlyAnimatedWidgetState<
       onSubmitted: widget.onSubmitted,
       progress: widget.progress,
       showDrawerHamburger: widget.showDrawerHamburger,
-      showLeadingBack: widget.showLeadingBack,
+      hideLeadingBack: widget.hideLeadingBack,
       toolbarOptions: widget.toolbarOptions,
       transitionDuration: widget.transitionDuration,
       transitionCurve: widget.transitionCurve,

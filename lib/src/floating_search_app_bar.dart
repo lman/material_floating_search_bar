@@ -87,7 +87,7 @@ class FloatingSearchAppBar extends ImplicitlyAnimatedWidget {
   final bool hideKeyboardOnDownScroll;
 
   /// {@macro floating_search_bar.showLeadingBack}
-  final bool showLeadingBack;
+  final bool hideLeadingBack;
 
   /// {@macro floating_search_bar.progress}
   final dynamic progress;
@@ -159,7 +159,7 @@ class FloatingSearchAppBar extends ImplicitlyAnimatedWidget {
     this.clearQueryOnClose = true,
     this.showDrawerHamburger = true,
     this.hideKeyboardOnDownScroll = false,
-    this.showLeadingBack = true,
+    this.hideLeadingBack = false,
     this.progress = 0.0,
     this.transitionDuration = const Duration(milliseconds: 500),
     this.transitionCurve = Curves.easeOut,
@@ -238,7 +238,7 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
     Widget leading;
     if (showHamburger) {
       leading = FloatingSearchBarAction.hamburgerToBack();
-    } else if (widget.showLeadingBack &&
+    } else if (!widget.hideLeadingBack &&
         (Navigator.canPop(context) || widget.body != null)) {
       leading =
           FloatingSearchBarAction.back(showIfClosed: Navigator.canPop(context));
