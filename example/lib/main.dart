@@ -54,12 +54,6 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final controller = FloatingSearchBarController();
 
-  @override
-  void initState() {
-    super.initState();
-    controller.query = 'ksljflkd';
-  }
-
   int _index = 0;
   int get index => _index;
   set index(int value) {
@@ -147,6 +141,7 @@ class _HomeState extends State<Home> {
       borderRadius: BorderRadius.circular(8),
       child: ImplicitlyAnimatedList<Place>(
         shrinkWrap: true,
+        padding: EdgeInsets.zero,
         physics: const NeverScrollableScrollPhysics(),
         items: model.suggestions.take(6).toList(),
         areItemsTheSame: (a, b) => a == b,
