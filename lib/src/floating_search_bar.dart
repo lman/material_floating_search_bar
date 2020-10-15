@@ -329,7 +329,7 @@ class FloatingSearchBar extends ImplicitlyAnimatedWidget {
   /// this `FloatingSearchBar`.
   final ScrollController scrollController;
 
-  /// The [EdgeInsets] of the [SingleChildScrollView] for the body of
+  /// The [EdgeInsets] of the [SingleChildScrollView] holding the expandable body of
   /// this `FloatingSearchBar`.
   final EdgeInsets scrollPadding;
   const FloatingSearchBar({
@@ -392,8 +392,8 @@ class FloatingSearchBar extends ImplicitlyAnimatedWidget {
   }
 }
 
-class FloatingSearchBarState
-    extends ImplicitlyAnimatedWidgetState<FloatingSearchBarStyle, FloatingSearchBar> {
+class FloatingSearchBarState extends ImplicitlyAnimatedWidgetState<
+    FloatingSearchBarStyle, FloatingSearchBar> {
   final GlobalKey<FloatingSearchAppBarState> barKey = GlobalKey();
   FloatingSearchAppBarState get barState => barKey.currentState;
 
@@ -512,7 +512,8 @@ class FloatingSearchBarState
       _assignController();
     }
 
-    if (widget.scrollController != null && widget.scrollController != _scrollController) {
+    if (widget.scrollController != null &&
+        widget.scrollController != _scrollController) {
       _scrollController = widget.scrollController;
     }
   }
@@ -650,12 +651,14 @@ class FloatingSearchBarState
               borderRadius: borderRadius,
               child: Container(
                 height: transition.lerpHeight(),
-                padding: EdgeInsets.only(top: padding.top, bottom: padding.bottom),
+                padding:
+                    EdgeInsets.only(top: padding.top, bottom: padding.bottom),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: transition.lerpBackgroundColor(),
-                  border:
-                      style.border != null ? Border.fromBorderSide(style.border) : null,
+                  border: style.border != null
+                      ? Border.fromBorderSide(style.border)
+                      : null,
                   borderRadius: borderRadius,
                 ),
                 constraints: boxConstraints,
@@ -763,7 +766,8 @@ class FloatingSearchBarState
                             maxWidth: transition.lerpInnerMaxWidth(),
                           )
                         : null,
-                    padding: EdgeInsets.only(left: padding.left, right: padding.right),
+                    padding: EdgeInsets.only(
+                        left: padding.left, right: padding.right),
                     child: textField,
                   ),
                   Align(
@@ -794,7 +798,8 @@ class FloatingSearchBarState
       child: Container(
         constraints: maxWidth != null
             ? BoxConstraints(
-                maxWidth: transition.lerpMaxWidth() + transition.lerpMargin().horizontal,
+                maxWidth: transition.lerpMaxWidth() +
+                    transition.lerpMargin().horizontal,
               )
             : null,
         child: body,
@@ -847,15 +852,18 @@ class FloatingSearchBarState
       maxWidth: widget.maxWidth,
       openMaxWidth: widget.openMaxWidth ?? widget.maxWidth,
       axisAlignment: widget.axisAlignment ?? 0.0,
-      openAxisAlignment: widget.openAxisAlignment ?? widget.axisAlignment ?? 0.0,
+      openAxisAlignment:
+          widget.openAxisAlignment ?? widget.axisAlignment ?? 0.0,
       backgroundColor: widget.backgroundColor ?? theme.cardColor,
       shadowColor: widget.shadowColor ?? Colors.black45,
-      backdropColor:
-          widget.backdropColor ?? widget.transition.backdropColor ?? Colors.black26,
+      backdropColor: widget.backdropColor ??
+          widget.transition.backdropColor ??
+          Colors.black26,
       border: widget.border ?? BorderSide.none,
       borderRadius: widget.borderRadius ?? BorderRadius.circular(4),
       margins: widget.margins ??
-          EdgeInsets.fromLTRB(8, MediaQuery.of(context).viewPadding.top + 6, 8, 0)
+          EdgeInsets.fromLTRB(
+                  8, MediaQuery.of(context).viewPadding.top + 6, 8, 0)
               .resolve(direction),
       padding: widget.padding,
       insets: widget.insets,

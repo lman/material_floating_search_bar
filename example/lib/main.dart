@@ -108,7 +108,8 @@ class _HomeState extends State<Home> {
           progress: model.isLoading,
           debounceDelay: const Duration(milliseconds: 500),
           onQueryChanged: model.onQueryChanged,
-          transition: CircularFloatingSearchBarTransition(),
+          scrollPadding: EdgeInsets.zero,
+          transition: ExpandingFloatingSearchBarTransition(),
           builder: (context, _) => buildExpandableBody(model),
           body: buildBody(),
         );
