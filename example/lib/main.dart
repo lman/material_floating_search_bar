@@ -91,6 +91,7 @@ class _HomeState extends State<Home> {
 
     return Consumer<SearchModel>(
       builder: (context, model, _) => FloatingSearchBar(
+        automaticallyImplyBackButton: false,
         controller: controller,
         clearQueryOnClose: true,
         hint: 'חיפוש...',
