@@ -9,7 +9,7 @@ import 'widgets/widgets.dart';
 /// input text of a [FloatingSearchBar].
 ///
 /// Typically this widget wraps a [CircularButton].
-class FloatingSearchBarAction extends StatefulWidget {
+class FloatingSearchBarAction extends StatelessWidget {
   /// The action.
   ///
   /// Typically a [CircularButton].
@@ -60,12 +60,14 @@ class FloatingSearchBarAction extends StatefulWidget {
   factory FloatingSearchBarAction.hamburgerToBack({
     double size = 24,
     Color color,
+    bool isLeading = true,
   }) {
     return FloatingSearchBarAction(
       showIfOpened: true,
       builder: (context, animation) {
+        final isLTR = Directionality.of(context) == TextDirection.ltr;
+
         return CircularButton(
-          size: size,
           onPressed: () {
             final bar = FloatingSearchAppBar.of(context);
             if (bar?.isOpen == true) {
@@ -74,11 +76,18 @@ class FloatingSearchBarAction extends StatefulWidget {
               Scaffold.of(context)?.openDrawer();
             }
           },
-          icon: AnimatedIcon(
-            icon: AnimatedIcons.menu_arrow,
-            progress: animation,
-            color: color,
-            size: size,
+          icon: RotatedBox(
+            quarterTurns: (isLTR ? 0 : 2) + (isLeading ? 0 : 2),
+            child: AnimatedIcon(
+              icon: AnimatedIcons.menu_arrow,
+              // Menu arrow has some weird errors on LTR...
+              // Always use LTR and rotate the widget manually
+              // for now.
+              textDirection: TextDirection.ltr,
+              progress: animation,
+              color: color,
+              size: size,
+            ),
           ),
         );
       },
@@ -101,8 +110,8 @@ class FloatingSearchBarAction extends StatefulWidget {
 
         return ValueListenableBuilder<String>(
           valueListenable: bar.queryNotifer,
-          builder: (context, value, _) {
-            final isEmpty = value.isEmpty;
+          builder: (context, query, _) {
+            final isEmpty = query.isEmpty;
 
             return SearchToClear(
               isEmpty: isEmpty,
@@ -178,26 +187,20 @@ class FloatingSearchBarAction extends StatefulWidget {
   }
 
   @override
-  _FloatingSearchBarActionState createState() =>
-      _FloatingSearchBarActionState();
-}
-
-class _FloatingSearchBarActionState extends State<FloatingSearchBarAction> {
-  @override
   Widget build(BuildContext context) {
-    if (widget.child != null) {
-      return widget.child;
+    if (child != null) {
+      return child;
+    } else {
+      final bar = FloatingSearchAppBar.of(context);
+      assert(bar != null, 'No ancestor FloatingSearchAppBar could be found!e');
+
+      return builder(context, bar.transitionAnimation);
     }
-
-    final bar = FloatingSearchAppBar.of(context);
-    assert(bar != null, 'No ancestor FloatingSearchAppBar could be found!e');
-
-    return widget.builder(context, bar.transitionAnimation);
   }
 }
 
 /// Creates a row for [FloatingSearchBarActions].
-class FloatingSearchActionBar extends StatefulWidget {
+class FloatingSearchActionBar extends StatelessWidget {
   final Animation animation;
   final List<Widget> actions;
   final IconThemeData iconTheme;
@@ -209,31 +212,23 @@ class FloatingSearchActionBar extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _FloatingSearchActionBarState createState() =>
-      _FloatingSearchActionBarState();
-}
-
-class _FloatingSearchActionBarState extends State<FloatingSearchActionBar> {
-  @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: widget.animation,
-      builder: (context, child) {
-        return IconTheme(
-          data: widget.iconTheme,
-          child: Row(
-            children: _mapActions(),
-          ),
-        );
-      },
+      animation: animation,
+      builder: (context, child) => IconTheme(
+        data: iconTheme,
+        child: Row(
+          children: _mapActions(),
+        ),
+      ),
     );
   }
 
   List<Widget> _mapActions() {
-    final actions = widget.actions ?? const <Widget>[];
+    final actions = this.actions ?? const <Widget>[];
 
-    final animation = ValleyingTween().animate(widget.animation);
-    final isOpen = widget.animation.value >= 0.5;
+    final animation = ValleyingTween().animate(this.animation);
+    final isOpen = this.animation.value >= 0.5;
 
     var openCount = 0;
     var closedCount = 0;
@@ -262,6 +257,7 @@ class _FloatingSearchActionBarState extends State<FloatingSearchActionBar> {
         final shouldScale = index <= ((isOpen ? closedCount : openCount) - 1);
         if (shouldScale) {
           return ScaleTransition(
+            alignment: Alignment.center,
             scale: animation,
             child: action,
           );

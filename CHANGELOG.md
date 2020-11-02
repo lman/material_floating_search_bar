@@ -1,18 +1,24 @@
-### 0.2.1 - 0.2.2
-- Bug fixes
+## 0.2.3
+
+* Improved RTL support (#13)
+* Added option to hide automatically implied back button (#12)
+
+## 0.2.2
+
+* Bug fixes
 
 ## 0.2.0
 
-- Added `FloatingSearchAppBar`
+* Added `FloatingSearchAppBar`
 
-### 0.1.6 - 0.1.7
+## 0.1.7
 
-- Scrolling
+* Scrolling
 
-### 0.1.1 - 0.1.5
+## 0.1.5
 
-- Bug fixes
+* Bug fixes
 
 ## 0.1.0
 
-- Initial release
+* Initial release

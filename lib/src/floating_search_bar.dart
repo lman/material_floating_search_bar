@@ -52,7 +52,7 @@ class FloatingSearchBar extends ImplicitlyAnimatedWidget {
 
   /// When specified, overrides the themes icon color for
   /// this `FloatingSearchBar`, for example to easily adjust
-  /// the icon color for all [actions] and [startActions].
+  /// the icon color for all [actions] and [leadingActions].
   final Color iconColor;
 
   /// The color that fills the available space when the
@@ -78,7 +78,7 @@ class FloatingSearchBar extends ImplicitlyAnimatedWidget {
   /// Only the horizontal values will be honored.
   final EdgeInsetsGeometry padding;
 
-  /// The padding between [startActions], the input field and [actions],
+  /// The padding between [leadingActions], the input field and [actions],
   /// respectively.
   ///
   /// Only the horizontal values will be honored.
@@ -146,25 +146,28 @@ class FloatingSearchBar extends ImplicitlyAnimatedWidget {
   /// {@endtemplate}
   final bool clearQueryOnClose;
 
-  /// {@template floating_search_bar.showDrawerHamburger}
+  /// {@template floating_search_bar.automaticallyImplyDrawerHamburger}
   /// Whether a hamburger menu should be shown when
   /// there is a [Scaffold] with a [Drawer] in the widget
   /// tree.
   ///
   /// When not specified, defaults to `true`.
   /// {@endtemplate}
-  final bool showDrawerHamburger;
+  final bool automaticallyImplyDrawerHamburger;
+
+  /// {@template floating_search_bar.automaticallyImplyBackButton}
+  /// Whether to automatically display a back button if the enclosing route
+  /// can be popped.
+  ///
+  /// When not specified, defaults to `true`.
+  /// {@endtemplate}
+  final bool automaticallyImplyBackButton;
 
   /// Whether the `FloatingSearchBar` should be closed when
   /// the backdrop was tapped.
   ///
   /// When not specified, defaults to `true`.
   final bool closeOnBackdropTap;
-
-  /// Whether to hide the leading back button completely.
-  ///
-  /// When not specified, defaults to `false`.
-  final bool hideLeadingBack;
 
   /// {@template floating_search_bar.progress}
   /// The progress of the [LinearProgressIndicator] inside the bar.
@@ -223,7 +226,7 @@ class FloatingSearchBar extends ImplicitlyAnimatedWidget {
   /// {@endtemplate}
   final List<Widget> actions;
 
-  /// {@template floating_search_bar.startActions}
+  /// {@template floating_search_bar.leadingActions}
   /// A list of widgets displayed in a row before the [TextField].
   ///
   /// Consider using [FloatingSearchBarAction]s for more advanced
@@ -232,7 +235,7 @@ class FloatingSearchBar extends ImplicitlyAnimatedWidget {
   /// In LTR languages, they will be displayed to the right of
   /// the [TextField].
   /// {@endtemplate}
-  final List<Widget> startActions;
+  final List<Widget> leadingActions;
 
   /// {@template floating_search_bar.onQueryChanged}
   /// A callback that gets invoked when the input of
@@ -361,9 +364,9 @@ class FloatingSearchBar extends ImplicitlyAnimatedWidget {
     this.hintStyle,
     this.queryStyle,
     this.clearQueryOnClose = true,
-    this.showDrawerHamburger = true,
+    this.automaticallyImplyDrawerHamburger = true,
+    this.automaticallyImplyBackButton = true,
     this.closeOnBackdropTap = true,
-    this.hideLeadingBack = false,
     this.progress = false,
     this.transitionDuration = const Duration(milliseconds: 500),
     this.transitionCurve = Curves.ease,
@@ -371,7 +374,7 @@ class FloatingSearchBar extends ImplicitlyAnimatedWidget {
     this.title,
     this.hint = 'Search...',
     this.actions,
-    this.startActions,
+    this.leadingActions,
     this.onQueryChanged,
     this.onSubmitted,
     this.onFocusChanged,
@@ -720,7 +723,7 @@ class FloatingSearchBarState extends ImplicitlyAnimatedWidgetState<
       implicitCurve: widget.curve,
       title: widget.title,
       actions: widget.actions,
-      startActions: widget.startActions,
+      leadingActions: widget.leadingActions,
       autocorrect: widget.autocorrect,
       clearQueryOnClose: widget.clearQueryOnClose,
       debounceDelay: widget.debounceDelay,
@@ -728,8 +731,9 @@ class FloatingSearchBarState extends ImplicitlyAnimatedWidgetState<
       onQueryChanged: widget.onQueryChanged,
       onSubmitted: widget.onSubmitted,
       progress: widget.progress,
-      showDrawerHamburger: widget.showDrawerHamburger,
-      hideLeadingBack: widget.hideLeadingBack,
+      automaticallyImplyDrawerHamburger:
+          widget.automaticallyImplyDrawerHamburger,
+      automaticallyImplyBackButton: widget.automaticallyImplyBackButton,
       toolbarOptions: widget.toolbarOptions,
       transitionDuration: widget.transitionDuration,
       transitionCurve: widget.transitionCurve,

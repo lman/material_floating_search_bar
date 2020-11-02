@@ -37,7 +37,7 @@ class FloatingSearchAppBar extends ImplicitlyAnimatedWidget {
   /// The padding of the bar
   final EdgeInsetsGeometry padding;
 
-  /// The horizontal spacing between [startActions], the input
+  /// The horizontal spacing between [leadingActions], the input
   /// field and [actions]
   final EdgeInsetsGeometry insets;
 
@@ -79,15 +79,15 @@ class FloatingSearchAppBar extends ImplicitlyAnimatedWidget {
   /// {@macro floating_search_bar.clearQueryOnClose}
   final bool clearQueryOnClose;
 
-  /// {@macro floating_search_bar.showDrawerHamburger}
-  final bool showDrawerHamburger;
+  /// {@macro floating_search_bar.automaticallyImplyDrawerHamburger}
+  final bool automaticallyImplyDrawerHamburger;
+
+  /// {@macro floating_search_bar.automaticallyImplyBackButton}
+  final bool automaticallyImplyBackButton;
 
   /// Hides the keyboard a [Scrollable] inside the [body] was scrolled and
   /// shows it again when the user scrolls to the top.
   final bool hideKeyboardOnDownScroll;
-
-  /// {@macro floating_search_bar.showLeadingBack}
-  final bool hideLeadingBack;
 
   /// {@macro floating_search_bar.progress}
   final dynamic progress;
@@ -110,8 +110,8 @@ class FloatingSearchAppBar extends ImplicitlyAnimatedWidget {
   /// {@macro floating_search_bar.actions}
   final List<Widget> actions;
 
-  /// {@macro floating_search_bar.startActions}
-  final List<Widget> startActions;
+  /// {@macro floating_search_bar.leadingActions}
+  final List<Widget> leadingActions;
 
   /// {@macro floating_search_bar.onQueryChanged}
   final OnQueryChangedCallback onQueryChanged;
@@ -157,9 +157,9 @@ class FloatingSearchAppBar extends ImplicitlyAnimatedWidget {
     this.bottom,
     this.alwaysOpened = false,
     this.clearQueryOnClose = true,
-    this.showDrawerHamburger = true,
+    this.automaticallyImplyDrawerHamburger = true,
     this.hideKeyboardOnDownScroll = false,
-    this.hideLeadingBack = false,
+    this.automaticallyImplyBackButton = false,
     this.progress = 0.0,
     this.transitionDuration = const Duration(milliseconds: 500),
     this.transitionCurve = Curves.easeOut,
@@ -167,7 +167,7 @@ class FloatingSearchAppBar extends ImplicitlyAnimatedWidget {
     this.title,
     this.hint = 'Search...',
     this.actions,
-    this.startActions,
+    this.leadingActions,
     this.onQueryChanged,
     this.onSubmitted,
     this.onFocusChanged,
@@ -222,26 +222,30 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
   bool get hasActions => actions.isNotEmpty;
   List<Widget> get actions {
     final actions = widget.actions ?? [FloatingSearchBarAction.searchToClear()];
-    final showHamburger = widget.showDrawerHamburger &&
+    final showHamburger = widget.automaticallyImplyDrawerHamburger &&
         (Scaffold.of(context)?.hasEndDrawer ?? false);
     return showHamburger
-        ? <Widget>[...actions, FloatingSearchBarAction.hamburgerToBack()]
+        ? <Widget>[
+            ...actions,
+            FloatingSearchBarAction.hamburgerToBack(isLeading: false)
+          ]
         : actions;
   }
 
-  bool get hasStartActions => startActions.isNotEmpty;
-  List<Widget> get startActions {
-    final actions = widget.startActions ?? const <Widget>[];
-    final showHamburger = widget.showDrawerHamburger &&
+  bool get hasleadingActions => leadingActions.isNotEmpty;
+  List<Widget> get leadingActions {
+    final actions = widget.leadingActions ?? const <Widget>[];
+    final showHamburger = widget.automaticallyImplyDrawerHamburger &&
         (Scaffold.of(context)?.hasDrawer ?? false);
 
     Widget leading;
     if (showHamburger) {
       leading = FloatingSearchBarAction.hamburgerToBack();
-    } else if (!widget.hideLeadingBack &&
+    } else if (widget.automaticallyImplyBackButton &&
         (Navigator.canPop(context) || widget.body != null)) {
-      leading =
-          FloatingSearchBarAction.back(showIfClosed: Navigator.canPop(context));
+      leading = FloatingSearchBarAction.back(
+        showIfClosed: Navigator.canPop(context),
+      );
     }
 
     return leading != null ? <Widget>[leading, ...actions] : actions;
@@ -384,7 +388,7 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
       return active.isNotEmpty;
     }
 
-    final hasStartActions = hasActions(startActions);
+    final hasleadingActions = hasActions(leadingActions);
     final hasEndActions = hasActions(actions);
 
     final isDefaultPadding = style.padding.horizontal == 24.0;
@@ -392,7 +396,7 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
 
     insets = EdgeInsets.lerp(
       style.insets.copyWith(
-        left: !hasStartActions ? inset : null,
+        left: !hasleadingActions ? inset : null,
         right: !hasEndActions ? inset : null,
       ),
       style.insets,
@@ -520,12 +524,12 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
       children: [
         FloatingSearchActionBar(
           animation: transitionAnimation,
-          actions: startActions,
+          actions: leadingActions,
           iconTheme: iconTheme,
         ),
         Expanded(
           child: Stack(
-            alignment: Alignment.centerLeft,
+            alignment: AlignmentDirectional.centerStart,
             children: <Widget>[
               _buildInputField(),
               buildGradient(isLeft: true),
@@ -633,12 +637,15 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
       }
     }
 
-    return SingleChildScrollView(
-      padding: insets,
-      scrollDirection: Axis.horizontal,
-      child: Opacity(
-        opacity: opacity,
-        child: input,
+    return NotificationListener<ScrollNotification>(
+      onNotification: (_) => true,
+      child: SingleChildScrollView(
+        padding: insets,
+        scrollDirection: Axis.horizontal,
+        child: Opacity(
+          opacity: opacity,
+          child: input,
+        ),
       ),
     );
   }
@@ -697,12 +704,12 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
       height: widget.height ?? kToolbarHeight,
       padding: widget.padding?.resolve(direction) ??
           EdgeInsetsDirectional.only(
-            start: hasStartActions ? 12 : 16,
+            start: hasleadingActions ? 12 : 16,
             end: hasActions ? 12 : 16,
           ).resolve(direction),
       insets: widget.insets?.resolve(direction) ??
           EdgeInsetsDirectional.only(
-            start: hasStartActions ? 16 : 0,
+            start: hasleadingActions ? 16 : 0,
             end: hasActions ? 16 : 0,
           ).resolve(direction),
       hintStyle: widget.hintStyle,

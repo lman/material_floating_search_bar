@@ -17,7 +17,7 @@ Click [here](https://github.com/bnxm/material_floating_search_bar/blob/master/ex
 Add it to your `pubspec.yaml` file:
 ```yaml
 dependencies:
-  material_floating_search_bar: ^0.2.2
+  material_floating_search_bar: ^0.2.3
 ```
 Install packages from the command line
 ```
@@ -115,11 +115,11 @@ There are many customization options:
 | `accentColor`               | The color used for elements such as the progress indicator. <br><br> Defaults to the themes accent color if not specified. 
 | `backgroundColor`           | The color of the card. <br><br> If not specified, defaults to `theme.cardColor`.
 | `shadowColor`               | The color of the shadow drawn when `elevation > 0`. <br><br> If not specified, defaults to `Colors.black54`.
-| `iconColor`                 | When specified, overrides the themes icon color for this `FloatingSearchBar`, for example to easily adjust the icon color for all `actions` and `startActions`.
+| `iconColor`                 | When specified, overrides the themes icon color for this `FloatingSearchBar`, for example to easily adjust the icon color for all `actions` and `leadingActions`.
 | `backdropColor`             | The color that fills the available space when the `FloatingSearchBar` is opened. <br><br> Typically a black-ish color. <br><br> If not specified, defaults to `Colors.black26`.
 | `margins`                   | The insets from the edges of its parent. <br><br> This can be used to position the `FloatingSearchBar`. <br><br> If not specifed, the `FloatingSearchBar` will try to position itself at the top offsetted by `MediaQuery.of(context).viewPadding.top` to avoid the status bar.
 | `padding`                   | The padding of the card. <br><br> Only the horizontal values will be honored.
-| `insets`                    | The padding between `startActions`, the input field and `actions` respectively. <br><br> Only the horizontal values will be honored.
+| `insets`                    | The padding between `leadingActions`, the input field and `actions` respectively. <br><br> Only the horizontal values will be honored.
 | `height`                    | The height of the card. <br><br> If not specified, defaults to `48.0` pixels.
 | `elevation`                 | The elevation of the card. 
 | `maxWidth`                  | The max width of the `FloatingSearchBar`. <br><br> By default the `FloatingSearchBar` will expand to fill all the available width. <br><br> This value can be set to avoid this.
@@ -131,9 +131,9 @@ There are many customization options:
 | `hintStyle`                 | The `TextStyle` for the hint in the `TextField`.
 | `queryStyle`                | The `TextStyle` for the input in the `TextField`.
 | `clearQueryOnClose`         | Whether the current query should be cleared when the `FloatingSearchBar` was closed. <br><br> When not specifed, defaults to `true`.
-| `showDrawerHamburger`       | Whether a hamburger menu should be shown when there is a `Scaffold` with a `Drawer` in the widget tree.
+| `automaticallyImplyDrawerHamburger`| Whether a hamburger menu should be shown when there is a `Scaffold` with a `Drawer` in the widget tree.
 | `closeOnBackdropTap`        | Whether the `FloatingSearchBar` should be closed when the backdrop was tapped. <br><br> When not specified, defaults to `true`.
-| `hideLeadingBack`           | Whether to hide the leading back button completely.<br><br> When not specified, defaults to `false`.
+| `automaticallyImplyBackButton`| Whether to automatically display a back button if the enclosing route can be popped.<br><br> When not specified, defaults to `true`.
 | `progress`                  | The progress of the `LinearProgressIndicator` inside the card. <br><br> When set to a `double` between `0..1`, will show show a determined `LinearProgressIndicator`. <br><br> When set to `true`, the `FloatingSearchBar` will show an indetermined `LinearProgressIndicator`. <br><br> When `null` or `false`, will hide the `LinearProgressIndicator`.
 | `transitionDuration`       |  The duration of the animation between opened and closed state.
 | `transitionCurve`          |  The curve for the animation between opened and closed state.
@@ -141,7 +141,7 @@ There are many customization options:
 | `title`                    | A widget that is shown in place of the `TextField` when the `FloatingSearchBar` is closed.
 | `hint`                    | The text value of the hint of the `TextField`.
 | `actions`                  | A list of widgets displayed in a row after the `TextField`. <br><br> Consider using `FloatingSearchBarActions` for more advanced actions that can interact with the `FloatingSearchBar`. <br><br> In LTR languages, they will be displayed to the left of the `TextField`.
-| `startActions`             | A list of widgets displayed in a row before the `TextField`. <br><br> Consider using `FloatingSearchBarActions` for more advanced actions that can interact with the `FloatingSearchBar`. <br><br> In LTR languages, they will be displayed to the right of the `TextField`. 
+| `leadingActions`             | A list of widgets displayed in a row before the `TextField`. <br><br> Consider using `FloatingSearchBarActions` for more advanced actions that can interact with the `FloatingSearchBar`. <br><br> In LTR languages, they will be displayed to the right of the `TextField`. 
 | `onQueryChanged`   | A callback that gets invoked when the input of the query inside the `TextField` changed.
 | `onSubmitted`   | A callback that gets invoked when the user submitted their query (e.g. hit the search button).
 | `onFocusChanged`            | A callback that gets invoked when the `FloatingSearchBar` receives or looses focus.

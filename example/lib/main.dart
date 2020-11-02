@@ -19,13 +19,8 @@ void main() {
     ),
   );
 
-  runApp(MaterialFloatingSearchBarExample());
-}
-
-class MaterialFloatingSearchBarExample extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  runApp(
+    MaterialApp(
       title: 'Material Floating Search Bar Example',
       debugShowCheckedModeBanner: false,
       theme: ThemeData.light().copyWith(
@@ -36,12 +31,15 @@ class MaterialFloatingSearchBarExample extends StatelessWidget {
           elevation: 4,
         ),
       ),
-      home: ChangeNotifierProvider(
-        create: (_) => SearchModel(),
-        child: const Home(),
+      home: Directionality(
+        textDirection: TextDirection.ltr,
+        child: ChangeNotifierProvider(
+          create: (_) => SearchModel(),
+          child: const Home(),
+        ),
       ),
-    );
-  }
+    ),
+  );
 }
 
 class Home extends StatefulWidget {
@@ -92,28 +90,26 @@ class _HomeState extends State<Home> {
     final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
 
     return Consumer<SearchModel>(
-      builder: (context, model, _) {
-        return FloatingSearchBar(
-          controller: controller,
-          clearQueryOnClose: true,
-          hint: 'Search for a new Place...',
-          iconColor: Colors.grey,
-          transitionDuration: const Duration(milliseconds: 800),
-          transitionCurve: Curves.easeInOutCubic,
-          physics: const BouncingScrollPhysics(),
-          axisAlignment: isPortrait ? 0.0 : -1.0,
-          openAxisAlignment: 0.0,
-          maxWidth: isPortrait ? 600 : 500,
-          actions: actions,
-          progress: model.isLoading,
-          debounceDelay: const Duration(milliseconds: 500),
-          onQueryChanged: model.onQueryChanged,
-          scrollPadding: EdgeInsets.zero,
-          transition: ExpandingFloatingSearchBarTransition(),
-          builder: (context, _) => buildExpandableBody(model),
-          body: buildBody(),
-        );
-      },
+      builder: (context, model, _) => FloatingSearchBar(
+        controller: controller,
+        clearQueryOnClose: true,
+        hint: 'חיפוש...',
+        iconColor: Colors.grey,
+        transitionDuration: const Duration(milliseconds: 800),
+        transitionCurve: Curves.easeInOutCubic,
+        physics: const BouncingScrollPhysics(),
+        axisAlignment: isPortrait ? 0.0 : -1.0,
+        openAxisAlignment: 0.0,
+        maxWidth: isPortrait ? 600 : 500,
+        actions: actions,
+        progress: model.isLoading,
+        debounceDelay: const Duration(milliseconds: 500),
+        onQueryChanged: model.onQueryChanged,
+        scrollPadding: EdgeInsets.zero,
+        transition: ExpandingFloatingSearchBarTransition(),
+        builder: (context, _) => buildExpandableBody(model),
+        body: buildBody(),
+      ),
     );
   }
 
@@ -235,23 +231,23 @@ class _HomeState extends State<Home> {
       items: const [
         BottomNavigationBarItem(
           icon: Icon(MdiIcons.homeVariantOutline),
-          title: Text('Explore'),
+          label: 'Explore',
         ),
         BottomNavigationBarItem(
           icon: Icon(MdiIcons.homeCityOutline),
-          title: Text('Commute'),
+          label: 'Commute',
         ),
         BottomNavigationBarItem(
           icon: Icon(MdiIcons.bookmarkOutline),
-          title: Text('Saved'),
+          label: 'Saved',
         ),
         BottomNavigationBarItem(
           icon: Icon(MdiIcons.plusCircleOutline),
-          title: Text('Contribute'),
+          label: 'Contribute',
         ),
         BottomNavigationBarItem(
           icon: Icon(MdiIcons.bellOutline),
-          title: Text('Updates'),
+          label: 'Updates',
         ),
       ],
     );
