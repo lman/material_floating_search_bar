@@ -159,7 +159,7 @@ class FloatingSearchAppBar extends ImplicitlyAnimatedWidget {
     this.clearQueryOnClose = true,
     this.automaticallyImplyDrawerHamburger = true,
     this.hideKeyboardOnDownScroll = false,
-    this.automaticallyImplyBackButton = false,
+    this.automaticallyImplyBackButton = true,
     this.progress = 0.0,
     this.transitionDuration = const Duration(milliseconds: 500),
     this.transitionCurve = Curves.easeOut,

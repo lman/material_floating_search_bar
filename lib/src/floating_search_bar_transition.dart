@@ -166,7 +166,6 @@ abstract class OverlayingFloatingSearchBarTransition
   /// Typically this gets revealed when the body has scrolled the amount specifieds
   /// by [spacing].
   final Widget divider;
-  // ignore: public_member_api_docs
   OverlayingFloatingSearchBarTransition({
     double spacing,
     this.divider,
