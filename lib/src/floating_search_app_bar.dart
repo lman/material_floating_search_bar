@@ -342,7 +342,6 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
   @override
   void didUpdateWidget(FloatingSearchAppBar oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _assignController();
 
     controller.duration = transitionDuration;
 
@@ -352,6 +351,8 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
         curve: widget.transitionCurve,
       );
     }
+
+    _assignController();
   }
 
   void open() => isOpen = true;
@@ -369,9 +370,7 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
 
   void clear() => _input.clear();
 
-  void _assignController() {
-    widget.controller?._appBarState = this;
-  }
+  void _assignController() => widget.controller?._appBarState = this;
 
   EdgeInsets insets;
   void _setInsets() {

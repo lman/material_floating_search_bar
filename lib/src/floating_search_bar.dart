@@ -517,19 +517,15 @@ class FloatingSearchBarState extends ImplicitlyAnimatedWidgetState<
       transition = widget.transition;
     }
 
-    if (widget.controller != null) {
-      _assignController();
-    }
-
     if (widget.scrollController != null &&
         widget.scrollController != _scrollController) {
       _scrollController = widget.scrollController;
     }
+
+    _assignController();
   }
 
-  void _assignController() {
-    widget.controller._searchBarState = this;
-  }
+  void _assignController() => widget.controller?._searchBarState = this;
 
   void show() => isVisible = true;
   void hide() => isVisible = false;
@@ -842,6 +838,8 @@ class FloatingSearchBarState extends ImplicitlyAnimatedWidgetState<
   void dispose() {
     _barRebuilder.dispose();
     _controller.dispose();
+
+    widget.controller?._searchBarState = null;
 
     if (widget.scrollController == null) {
       _scrollController?.dispose();

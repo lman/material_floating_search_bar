@@ -1,3 +1,7 @@
+## 0.2.4
+
+* **Fixed** Bugs
+
 ## 0.2.3
 
 * **Breaking** Renamed `showDrawerHamburger` to `automaticallyDrawerHamburger`
