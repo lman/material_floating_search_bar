@@ -1,3 +1,7 @@
+## 0.2.6
+
+* **Fixed** `FloatingSearchBarNotifier` notifications on bounce backs/overscroll
+
 ## 0.2.5
 
 * **Fixed** High CPU idle usage (#20)
