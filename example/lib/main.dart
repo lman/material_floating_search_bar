@@ -107,7 +107,7 @@ class _HomeState extends State<Home> {
         debounceDelay: const Duration(milliseconds: 500),
         onQueryChanged: model.onQueryChanged,
         scrollPadding: EdgeInsets.zero,
-        transition: ExpandingFloatingSearchBarTransition(),
+        transition: CircularFloatingSearchBarTransition(),
         builder: (context, _) => buildExpandableBody(model),
         body: buildBody(),
       ),

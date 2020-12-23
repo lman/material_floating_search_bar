@@ -216,8 +216,8 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
   Color get accentColor => style.accentColor;
   Color get iconColor => style.iconColor;
   Color get shadowColor => style.shadowColor;
-  Color get backgroundColor => Color.lerp(
-      style.backgroundColor, style.colorOnScroll, scrollAnimation.value);
+  Color get backgroundColor =>
+      Color.lerp(style.backgroundColor, style.colorOnScroll, scrollAnimation.value);
 
   bool get hasActions => actions.isNotEmpty;
   List<Widget> get actions {
@@ -225,10 +225,7 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
     final showHamburger = widget.automaticallyImplyDrawerHamburger &&
         (Scaffold.of(context)?.hasEndDrawer ?? false);
     return showHamburger
-        ? <Widget>[
-            ...actions,
-            FloatingSearchBarAction.hamburgerToBack(isLeading: false)
-          ]
+        ? <Widget>[...actions, FloatingSearchBarAction.hamburgerToBack(isLeading: false)]
         : actions;
   }
 
@@ -416,10 +413,9 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
     final height = style.height + _statusBarHeight;
     double prevPixels = 0.0;
 
-    final brightness =
-        widget.brightness ?? backgroundColor.computeLuminance() > 0.7
-            ? Brightness.light
-            : Brightness.dark;
+    final brightness = widget.brightness ?? backgroundColor.computeLuminance() > 0.7
+        ? Brightness.light
+        : Brightness.dark;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: brightness == Brightness.dark
@@ -509,15 +505,17 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
         alignment: Alignment.bottomCenter,
         children: [
           bar,
-          _buildProgressBar(),
+          _FloatingSearchProgressBar(
+            progress: widget.progress,
+            color: style.accentColor ?? Theme.of(context).accentColor,
+          ),
         ],
       ),
     );
   }
 
   Widget _buildInputAndActions() {
-    final iconTheme =
-        Theme.of(context).iconTheme.copyWith(color: style.iconColor);
+    final iconTheme = Theme.of(context).iconTheme.copyWith(color: style.iconColor);
 
     return Row(
       children: [
@@ -573,8 +571,7 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
     final showTitle = widget.title != null || (!hasQuery && query.isNotEmpty);
     final opacity = showTitle ? animation.value : 1.0;
 
-    final showTextInput =
-        showTitle ? controller.value > 0.5 : controller.value > 0.0;
+    final showTextInput = showTitle ? controller.value > 0.5 : controller.value > 0.0;
 
     Widget input;
     if (showTextInput) {
@@ -594,6 +591,7 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
           keyboardType: widget.textInputType,
           onSubmitted: widget.onSubmitted,
           decoration: InputDecoration(
+            isDense: true,
             hintText: widget.hint,
             hintStyle: style.hintStyle,
             contentPadding: EdgeInsets.zero,
@@ -625,8 +623,7 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
 
         final textStyle = hasQuery
             ? style.queryStyle ?? textTheme.subtitle1
-            : style.hintStyle ??
-                textTheme.subtitle1.copyWith(color: theme.hintColor);
+            : style.hintStyle ?? textTheme.subtitle1.copyWith(color: theme.hintColor);
 
         input = Text(
           hasQuery ? query : widget.hint,
@@ -644,31 +641,6 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
         child: Opacity(
           opacity: opacity,
           child: input,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProgressBar() {
-    final progress = widget.progress;
-    const progressBarHeight = 2.75;
-
-    final progressBarColor = style.accentColor ?? Theme.of(context).accentColor;
-    final showProgresBar = progress != null &&
-        (progress is num || (progress is bool && progress == true));
-    final progressValue =
-        progress is num ? progress.toDouble().clamp(0.0, 1.0) : null;
-
-    return AnimatedOpacity(
-      opacity: showProgresBar ? 1.0 : 0.0,
-      duration: const Duration(milliseconds: 150),
-      child: SizedBox(
-        height: progressBarHeight,
-        child: LinearProgressIndicator(
-          value: progressValue,
-          semanticsValue: progressValue?.toStringAsFixed(2),
-          backgroundColor: Colors.transparent,
-          valueColor: AlwaysStoppedAnimation(progressBarColor),
         ),
       ),
     );
@@ -692,6 +664,7 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
     final direction = Directionality.of(context);
 
     return FloatingSearchAppBarStyle(
+      height: widget.height ?? kToolbarHeight,
       accentColor: widget.accentColor ?? theme.accentColor,
       backgroundColor: widget.color ?? theme.cardColor ?? Colors.white,
       iconColor: widget.iconColor ?? theme.iconTheme.color,
@@ -700,7 +673,6 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
       elevation: widget.elevation ?? appBar.elevation,
       liftOnScrollElevation:
           widget.liftOnScrollElevation ?? widget.elevation ?? appBar.elevation,
-      height: widget.height ?? kToolbarHeight,
       padding: widget.padding?.resolve(direction) ??
           EdgeInsetsDirectional.only(
             start: hasleadingActions ? 12 : 16,
@@ -723,4 +695,77 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
     double t,
   ) =>
       a.scaleTo(b, t);
+}
+
+class _FloatingSearchProgressBar extends StatefulWidget {
+  final dynamic progress;
+  final Color color;
+  const _FloatingSearchProgressBar({
+    Key key,
+    @required this.progress,
+    @required this.color,
+  }) : super(key: key);
+
+  @override
+  _FloatingSearchProgressBarState createState() => _FloatingSearchProgressBarState();
+}
+
+class _FloatingSearchProgressBarState extends State<_FloatingSearchProgressBar>
+    with SingleTickerProviderStateMixin {
+  AnimationController _controller;
+
+  dynamic get progress => widget.progress;
+  bool get showProgressBar => _controller.value > 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    )..addListener(
+        () => setState(() {}),
+      );
+  }
+
+  @override
+  void didUpdateWidget(_FloatingSearchProgressBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    final show =
+        progress != null && (progress is num || (progress is bool && progress == true));
+
+    show ? _controller.forward() : _controller.reverse();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const height = 2.75;
+
+    final progressValue = progress is num ? progress.toDouble().clamp(0.0, 1.0) : null;
+
+    if (showProgressBar) {
+      return Opacity(
+        opacity: _controller.value,
+        child: SizedBox(
+          height: height,
+          child: LinearProgressIndicator(
+            value: progressValue,
+            semanticsValue: progressValue?.toStringAsFixed(2),
+            backgroundColor: Colors.transparent,
+            valueColor: AlwaysStoppedAnimation(widget.color),
+          ),
+        ),
+      );
+    } else {
+      return const SizedBox(height: height);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 }
