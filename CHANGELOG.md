@@ -1,3 +1,8 @@
+## 0.2.5
+
+* **Fixed** High CPU idle usage (#20)
+* **Improved** Small floating search bar height (#19)
+
 ## 0.2.4
 
 * **Fixed** Bugs
