@@ -13,13 +13,13 @@ class FloatingSearchBarAction extends StatelessWidget {
   /// The action.
   ///
   /// Typically a [CircularButton].
-  final Widget child;
+  final Widget? child;
 
   /// A builder that can be used when the action needs
   /// to react to changes in its [FloatingSearchBar].
   ///
   /// View [FloatingSearchBarAction.searchToClear] for an example.
-  final Widget Function(BuildContext context, Animation animation) builder;
+  final Widget Function(BuildContext context, Animation<double> animation)? builder;
 
   /// Whether this action should be shown when the [FloatingSearchBar]
   /// is opened.
@@ -40,7 +40,7 @@ class FloatingSearchBarAction extends StatelessWidget {
   ///
   /// Typically this widget wraps a [CircularButton].
   const FloatingSearchBarAction({
-    Key key,
+    Key? key,
     this.child,
     this.builder,
     this.showIfOpened = false,
@@ -59,7 +59,7 @@ class FloatingSearchBarAction extends StatelessWidget {
   /// transitions into a back button.
   factory FloatingSearchBarAction.hamburgerToBack({
     double size = 24,
-    Color color,
+    Color? color,
     bool isLeading = true,
   }) {
     return FloatingSearchBarAction(
@@ -73,7 +73,7 @@ class FloatingSearchBarAction extends StatelessWidget {
             if (bar?.isOpen == true) {
               bar?.close();
             } else {
-              Scaffold.of(context)?.openDrawer();
+              Scaffold.of(context).openDrawer();
             }
           },
           icon: RotatedBox(
@@ -98,7 +98,7 @@ class FloatingSearchBarAction extends StatelessWidget {
   /// when the query of the [FloatingSearchBar] is not empty.
   factory FloatingSearchBarAction.searchToClear({
     double size = 24,
-    Color color,
+    Color? color,
     bool showIfClosed = true,
     Duration duration = const Duration(milliseconds: 900),
   }) {
@@ -106,7 +106,7 @@ class FloatingSearchBarAction extends StatelessWidget {
       showIfOpened: true,
       showIfClosed: showIfClosed,
       builder: (context, animation) {
-        final bar = FloatingSearchAppBar.of(context);
+        final bar = FloatingSearchAppBar.of(context)!;
 
         return ValueListenableBuilder<String>(
           valueListenable: bar.queryNotifer,
@@ -116,14 +116,13 @@ class FloatingSearchBarAction extends StatelessWidget {
             return SearchToClear(
               isEmpty: isEmpty,
               size: size,
-              color: color ?? bar?.style?.iconColor,
-              duration: (duration ?? bar.transitionDuration) * 0.5,
+              color: color ?? bar.style.iconColor,
+              duration: duration * 0.5,
               onTap: () {
                 if (!isEmpty) {
                   bar.clear();
                 } else {
-                  bar.isOpen =
-                      !bar.isOpen || (!bar.hasFocus && bar.isAlwaysOpened);
+                  bar.isOpen = !bar.isOpen || (!bar.hasFocus && bar.isAlwaysOpened);
                 }
               },
             );
@@ -135,7 +134,7 @@ class FloatingSearchBarAction extends StatelessWidget {
 
   factory FloatingSearchBarAction.back({
     double size = 24,
-    Color color,
+    Color? color,
     bool showIfClosed = false,
   }) {
     return FloatingSearchBarAction(
@@ -149,7 +148,7 @@ class FloatingSearchBarAction extends StatelessWidget {
           size: size,
           icon: Icon(Icons.arrow_back, color: color, size: size),
           onPressed: () {
-            final bar = FloatingSearchAppBar.of(context);
+            final bar = FloatingSearchAppBar.of(context)!;
 
             if (bar.isOpen && !bar.isAlwaysOpened) {
               bar.close();
@@ -165,16 +164,12 @@ class FloatingSearchBarAction extends StatelessWidget {
   /// A convenience factory to wrap an [Icon] or an [IconData]
   /// into an action.
   factory FloatingSearchBarAction.icon({
-    @required dynamic icon,
-    @required VoidCallback onTap,
+    required dynamic icon,
+    required VoidCallback onTap,
     double size = 24.0,
     bool showIfOpened = false,
     bool showIfClosed = true,
   }) {
-    assert(size != null);
-    assert(icon != null);
-    assert(onTap != null);
-
     return FloatingSearchBarAction(
       child: CircularButton(
         size: size,
@@ -188,26 +183,23 @@ class FloatingSearchBarAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (child != null) {
-      return child;
-    } else {
-      final bar = FloatingSearchAppBar.of(context);
-      assert(bar != null, 'No ancestor FloatingSearchAppBar could be found!e');
-
-      return builder(context, bar.transitionAnimation);
-    }
+    return child ??
+        builder!(
+          context,
+          FloatingSearchAppBar.of(context)!.transitionAnimation,
+        );
   }
 }
 
 /// Creates a row for [FloatingSearchBarActions].
 class FloatingSearchActionBar extends StatelessWidget {
-  final Animation animation;
+  final Animation<double> animation;
   final List<Widget> actions;
-  final IconThemeData iconTheme;
+  final IconThemeData? iconTheme;
   const FloatingSearchActionBar({
-    Key key,
-    @required this.animation,
-    @required this.actions,
+    Key? key,
+    required this.animation,
+    required this.actions,
     this.iconTheme,
   }) : super(key: key);
 
@@ -216,7 +208,7 @@ class FloatingSearchActionBar extends StatelessWidget {
     return AnimatedBuilder(
       animation: animation,
       builder: (context, child) => IconTheme(
-        data: iconTheme,
+        data: iconTheme ?? Theme.of(context).iconTheme,
         child: Row(
           children: _mapActions(),
         ),
@@ -225,8 +217,6 @@ class FloatingSearchActionBar extends StatelessWidget {
   }
 
   List<Widget> _mapActions() {
-    final actions = this.actions ?? const <Widget>[];
-
     final animation = ValleyingTween().animate(this.animation);
     final isOpen = this.animation.value >= 0.5;
 
@@ -242,8 +232,7 @@ class FloatingSearchActionBar extends StatelessWidget {
     final currentActions = List<Widget>.from(actions)
       ..removeWhere((action) {
         if (action is FloatingSearchBarAction) {
-          return (isOpen && !action.showIfOpened) ||
-              (!isOpen && !action.showIfClosed);
+          return (isOpen && !action.showIfOpened) || (!isOpen && !action.showIfClosed);
         } else {
           return false;
         }

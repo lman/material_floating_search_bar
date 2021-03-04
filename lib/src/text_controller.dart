@@ -4,17 +4,13 @@ import 'package:flutter/material.dart';
 /// and maintains the selection extent when the text
 /// changes.
 class TextController extends TextEditingController {
-  FocusNode _node;
-
   /// Creates a [TextEditingController] that wraps a [FocusNode]
   /// and maintains the selection extent when the text
   /// changes.
-  TextController() {
-    _node = FocusNode();
-  }
+  TextController();
 
   /// The [FocusNode] of this [TextController].
-  FocusNode get node => _node;
+  final node = FocusNode();
 
   @override
   set text(String newText) {
@@ -36,30 +32,29 @@ class TextController extends TextEditingController {
   }
 
   /// Moves the Cursor to the end of the current text.
-  void moveCursorToEnd() =>
-      selection = TextSelection.collapsed(offset: text.length);
+  void moveCursorToEnd() => selection = TextSelection.collapsed(offset: text.length);
 
   /// Request focus for the [FocusNode] wrapped by this
   /// [TextController].
   void requestFocus() {
-    _node.requestFocus();
+    node.requestFocus();
   }
 
   /// Cleares the focus of the [FocusNode] wrapped by this
   /// [TextController].
   void clearFocus() {
-    _node.unfocus(
+    node.unfocus(
       disposition: UnfocusDisposition.previouslyFocusedChild,
     );
   }
 
   /// Whether the [FocusNode] wrapped by this
   /// [TextController] is currenty focused.
-  bool get hasFocus => _node.hasFocus;
+  bool get hasFocus => node.hasFocus;
 
   @override
   void dispose() {
-    _node?.dispose();
+    node.dispose();
     super.dispose();
   }
 }

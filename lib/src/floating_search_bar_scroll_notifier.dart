@@ -18,8 +18,8 @@ class FloatingSearchBarScrollNotifier extends StatelessWidget {
   /// when the user scrolls down and shown again when the user scrolls
   /// up.
   const FloatingSearchBarScrollNotifier({
-    Key key,
-    @required this.child,
+    Key? key,
+    required this.child,
   }) : super(key: key);
 
   @override

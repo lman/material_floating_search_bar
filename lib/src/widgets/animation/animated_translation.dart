@@ -11,10 +11,10 @@ class AnimatedTranslation extends StatelessWidget {
   final Curve curve;
   final bool isFractional;
   const AnimatedTranslation({
-    Key key,
-    @required this.translation,
-    @required this.duration,
-    @required this.child,
+    Key? key,
+    required this.translation,
+    required this.duration,
+    required this.child,
     this.curve = Curves.linear,
     this.isFractional = false,
   }) : super(key: key);
@@ -22,7 +22,7 @@ class AnimatedTranslation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ImplicitAnimationBuilder<Offset>(
-      lerp: Offset.lerp,
+      lerp: (a, b, t) => Offset.lerp(a, b, t)!,
       value: translation,
       curve: curve,
       duration: duration,

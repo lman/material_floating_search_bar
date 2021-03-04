@@ -20,7 +20,7 @@ class FloatingSearchBarDismissable extends StatefulWidget {
   final Widget child;
 
   /// The amount of space by which to inset the child.
-  final EdgeInsets padding;
+  final EdgeInsetsGeometry? padding;
 
   /// An object that can be used to control the position to which this scroll
   /// view is scrolled.
@@ -34,7 +34,7 @@ class FloatingSearchBarDismissable extends StatefulWidget {
   /// [ScrollController.keepScrollOffset]). It can be used to read the current
   /// scroll position (see [ScrollController.offset]), or change it (see
   /// [ScrollController.animateTo]).
-  final ScrollController controller;
+  final ScrollController? controller;
 
   /// How the scroll view should respond to user input.
   ///
@@ -42,24 +42,22 @@ class FloatingSearchBarDismissable extends StatefulWidget {
   /// user stops dragging the scroll view.
   ///
   /// Defaults to matching platform conventions.
-  final ScrollPhysics physics;
+  final ScrollPhysics? physics;
 
   const FloatingSearchBarDismissable({
-    Key key,
-    @required this.child,
+    Key? key,
+    required this.child,
     this.padding,
     this.controller,
     this.physics,
-  })  : assert(child != null),
-        super(key: key);
+  }) : super(key: key);
 
   @override
   _FloatingSearchBarDismissableState createState() =>
       _FloatingSearchBarDismissableState();
 }
 
-class _FloatingSearchBarDismissableState<E>
-    extends State<FloatingSearchBarDismissable> {
+class _FloatingSearchBarDismissableState<E> extends State<FloatingSearchBarDismissable> {
   final childKey = GlobalKey();
 
   double childHeight = 0.0;
@@ -69,7 +67,7 @@ class _FloatingSearchBarDismissableState<E>
 
   void _measure() {
     postFrame(
-      () => childHeight = childKey?.height,
+      () => childHeight = childKey.height ?? 0.0,
     );
   }
 
@@ -77,15 +75,17 @@ class _FloatingSearchBarDismissableState<E>
   Widget build(BuildContext context) {
     _measure();
 
+    final padding =
+        widget.padding?.resolve(Directionality.of(context)) ?? EdgeInsets.zero;
+
     return GestureDetector(
       onTapDown: (details) => tapDy = details.localPosition.dy,
       onPanDown: (details) => tapDy = details.localPosition.dy,
       onPanUpdate: (details) => tapDy = details.localPosition.dy,
       onTap: () {
-        final padding = widget.padding;
         final offset = max(scrollOffset - padding.top, 0.0);
 
-        void close() => FloatingSearchBar.of(context).close();
+        void close() => FloatingSearchBar.of(context)!.close();
 
         if (tapDy < padding.top) {
           close();
@@ -106,7 +106,7 @@ class _FloatingSearchBarDismissableState<E>
         child: SingleChildScrollView(
           controller: widget.controller,
           physics: widget.physics,
-          padding: widget.padding.add(
+          padding: padding.add(
             EdgeInsets.only(
               bottom: MediaQuery.of(context).viewInsets.bottom,
             ),

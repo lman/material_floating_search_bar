@@ -7,51 +7,51 @@ import 'package:flutter/material.dart';
 class FloatingSearchBarStyle {
   final Color backgroundColor;
   final Color shadowColor;
+  final Color backdropColor;
   final EdgeInsets padding;
   final EdgeInsets insets;
+  final EdgeInsets margins;
   final double height;
   final double elevation;
-  final Color backdropColor;
   final BorderSide border;
   final BorderRadius borderRadius;
-  final EdgeInsets margins;
-  final double maxWidth;
-  final double openMaxWidth;
+  final double? maxWidth;
+  final double? openMaxWidth;
   final double axisAlignment;
   final double openAxisAlignment;
   const FloatingSearchBarStyle({
-    @required this.backgroundColor,
-    @required this.shadowColor,
-    @required this.padding,
-    @required this.insets,
-    @required this.height,
-    @required this.elevation,
-    @required this.backdropColor,
-    @required this.border,
-    @required this.borderRadius,
-    @required this.margins,
-    @required this.maxWidth,
-    @required this.openMaxWidth,
-    @required this.axisAlignment,
-    @required this.openAxisAlignment,
+    required this.backgroundColor,
+    required this.shadowColor,
+    required this.padding,
+    required this.insets,
+    required this.height,
+    required this.elevation,
+    required this.backdropColor,
+    required this.border,
+    required this.borderRadius,
+    required this.margins,
+    required this.maxWidth,
+    required this.openMaxWidth,
+    required this.axisAlignment,
+    required this.openAxisAlignment,
   });
 
   FloatingSearchBarStyle scaleTo(FloatingSearchBarStyle b, double t) {
     return FloatingSearchBarStyle(
-      height: lerpDouble(height, b.height, t),
-      elevation: lerpDouble(elevation, b.elevation, t),
+      height: lerpDouble(height, b.height, t)!,
+      elevation: lerpDouble(elevation, b.elevation, t)!,
       maxWidth: lerpDouble(maxWidth, b.maxWidth, t),
       openMaxWidth: lerpDouble(openMaxWidth, b.openMaxWidth, t),
-      axisAlignment: lerpDouble(axisAlignment, b.axisAlignment, t),
-      openAxisAlignment: lerpDouble(openAxisAlignment, b.openAxisAlignment, t),
-      backgroundColor: Color.lerp(backgroundColor, b.backgroundColor, t),
-      backdropColor: Color.lerp(backdropColor, b.backdropColor, t),
-      shadowColor: Color.lerp(shadowColor, b.shadowColor, t),
-      insets: EdgeInsetsGeometry.lerp(insets, b.insets, t),
-      margins: EdgeInsetsGeometry.lerp(margins, b.margins, t),
-      padding: EdgeInsetsGeometry.lerp(padding, b.padding, t),
+      axisAlignment: lerpDouble(axisAlignment, b.axisAlignment, t)!,
+      openAxisAlignment: lerpDouble(openAxisAlignment, b.openAxisAlignment, t)!,
+      backgroundColor: Color.lerp(backgroundColor, b.backgroundColor, t)!,
+      backdropColor: Color.lerp(backdropColor, b.backdropColor, t)!,
+      shadowColor: Color.lerp(shadowColor, b.shadowColor, t)!,
+      insets: EdgeInsets.lerp(insets, b.insets, t)!,
+      margins: EdgeInsets.lerp(margins, b.margins, t)!,
+      padding: EdgeInsets.lerp(padding, b.padding, t)!,
       border: BorderSide.lerp(border, b.border, t),
-      borderRadius: BorderRadius.lerp(borderRadius, b.borderRadius, t),
+      borderRadius: BorderRadius.lerp(borderRadius, b.borderRadius, t)!,
     );
   }
 
@@ -105,42 +105,42 @@ class FloatingSearchAppBarStyle {
   final Color backgroundColor;
   final Color shadowColor;
   final Color iconColor;
-  final Color colorOnScroll;
+  final Color? colorOnScroll;
   final EdgeInsets padding;
   final EdgeInsets insets;
   final double height;
   final double elevation;
   final double liftOnScrollElevation;
-  final TextStyle hintStyle;
-  final TextStyle queryStyle;
+  final TextStyle? hintStyle;
+  final TextStyle? queryStyle;
   const FloatingSearchAppBarStyle({
-    @required this.accentColor,
-    @required this.backgroundColor,
-    @required this.shadowColor,
-    @required this.iconColor,
-    @required this.colorOnScroll,
-    @required this.padding,
-    @required this.insets,
-    @required this.height,
-    @required this.elevation,
-    @required this.liftOnScrollElevation,
-    @required this.hintStyle,
-    @required this.queryStyle,
+    required this.accentColor,
+    required this.backgroundColor,
+    required this.shadowColor,
+    required this.iconColor,
+    required this.colorOnScroll,
+    required this.padding,
+    required this.insets,
+    required this.height,
+    required this.elevation,
+    required this.liftOnScrollElevation,
+    required this.hintStyle,
+    required this.queryStyle,
   });
 
   FloatingSearchAppBarStyle scaleTo(FloatingSearchAppBarStyle b, double t) {
     return FloatingSearchAppBarStyle(
-      height: lerpDouble(height, b.height, t),
-      elevation: lerpDouble(elevation, b.elevation, t),
+      height: lerpDouble(height, b.height, t)!,
+      elevation: lerpDouble(elevation, b.elevation, t)!,
       liftOnScrollElevation:
-          lerpDouble(liftOnScrollElevation, b.liftOnScrollElevation, t),
-      accentColor: Color.lerp(accentColor, b.accentColor, t),
-      backgroundColor: Color.lerp(backgroundColor, b.backgroundColor, t),
+          lerpDouble(liftOnScrollElevation, b.liftOnScrollElevation, t)!,
+      accentColor: Color.lerp(accentColor, b.accentColor, t)!,
+      backgroundColor: Color.lerp(backgroundColor, b.backgroundColor, t)!,
       colorOnScroll: Color.lerp(colorOnScroll, b.colorOnScroll, t),
-      shadowColor: Color.lerp(shadowColor, b.shadowColor, t),
-      iconColor: Color.lerp(iconColor, b.iconColor, t),
-      insets: EdgeInsetsGeometry.lerp(insets, b.insets, t),
-      padding: EdgeInsetsGeometry.lerp(padding, b.padding, t),
+      shadowColor: Color.lerp(shadowColor, b.shadowColor, t)!,
+      iconColor: Color.lerp(iconColor, b.iconColor, t)!,
+      insets: EdgeInsets.lerp(insets, b.insets, t)!,
+      padding: EdgeInsets.lerp(padding, b.padding, t)!,
       hintStyle: TextStyle.lerp(hintStyle, b.hintStyle, t),
       queryStyle: TextStyle.lerp(queryStyle, b.queryStyle, t),
     );

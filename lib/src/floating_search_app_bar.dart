@@ -13,51 +13,51 @@ typedef OnFocusChangedCallback = void Function(bool isFocused);
 /// [FloatingSearchBar].
 class FloatingSearchAppBar extends ImplicitlyAnimatedWidget {
   /// The widget displayed below the [FloatingSearchAppBar]
-  final Widget body;
+  final Widget? body;
 
   // * --- Style properties --- *
 
   /// The accent color used for example for the
   /// progress indicator
-  final Color accentColor;
+  final Color? accentColor;
 
   /// The background color of the bar
-  final Color color;
+  final Color? color;
 
   /// The color of the bar when a [Scrollable]
   /// inside the [body] was scrolled (i.e. is not at the top)
-  final Color colorOnScroll;
+  final Color? colorOnScroll;
 
   /// The shadow color for the elevation
-  final Color shadowColor;
+  final Color? shadowColor;
 
   /// Can be used to override the `IconThemeDatas` color
-  final Color iconColor;
+  final Color? iconColor;
 
   /// The padding of the bar
-  final EdgeInsetsGeometry padding;
+  final EdgeInsetsGeometry? padding;
 
   /// The horizontal spacing between [leadingActions], the input
   /// field and [actions]
-  final EdgeInsetsGeometry insets;
+  final EdgeInsetsGeometry? insets;
 
   /// The height of the bar
   ///
   /// Defaults to `56.0`
-  final double height;
+  final double? height;
 
   /// The elevation of the bar
-  final double elevation;
+  final double? elevation;
 
   /// The elevation of the bar when a [Scrollable]
   /// inside the [body] was scrolled (i.e. it's not at the top)
   final double liftOnScrollElevation;
 
   /// The [TextStyle] for the hint of the input field
-  final TextStyle hintStyle;
+  final TextStyle? hintStyle;
 
   /// The [TextStyle] for the title of the bar
-  final TextStyle titleStyle;
+  final TextStyle? titleStyle;
 
   /// The [Brightness] that is used for adjusting the
   /// status bar icon brightness.
@@ -65,10 +65,10 @@ class FloatingSearchAppBar extends ImplicitlyAnimatedWidget {
   /// By default the brightness is dynamically calculated
   /// based on the brightness of the [color] or
   /// the [colorOnScroll] respectively.
-  final Brightness brightness;
+  final Brightness? brightness;
 
   // * --- Utility --- *
-  final Widget bottom;
+  final Widget? bottom;
 
   /// Whether the bar should be always in opened state.
   ///
@@ -102,28 +102,28 @@ class FloatingSearchAppBar extends ImplicitlyAnimatedWidget {
   final Duration debounceDelay;
 
   /// {@macro floating_search_bar.title}
-  final Widget title;
+  final Widget? title;
 
   /// {@macro floating_search_bar.hint}
-  final String hint;
+  final String? hint;
 
   /// {@macro floating_search_bar.actions}
-  final List<Widget> actions;
+  final List<Widget>? actions;
 
   /// {@macro floating_search_bar.leadingActions}
-  final List<Widget> leadingActions;
+  final List<Widget>? leadingActions;
 
   /// {@macro floating_search_bar.onQueryChanged}
-  final OnQueryChangedCallback onQueryChanged;
+  final OnQueryChangedCallback? onQueryChanged;
 
   /// {@macro floating_search_bar.onSubmitted}
-  final OnQueryChangedCallback onSubmitted;
+  final OnQueryChangedCallback? onSubmitted;
 
   /// {@macro floating_search_bar.onFocusChanged}
-  final OnFocusChangedCallback onFocusChanged;
+  final OnFocusChangedCallback? onFocusChanged;
 
   /// {@macro floating_search_bar.controller}
-  final FloatingSearchBarController controller;
+  final FloatingSearchBarController? controller;
 
   /// {@macro floating_search_bar.textInputAction}
   final TextInputAction textInputAction;
@@ -135,12 +135,12 @@ class FloatingSearchAppBar extends ImplicitlyAnimatedWidget {
   final bool autocorrect;
 
   /// {@macro floating_search_bar.toolbarOptions}
-  final ToolbarOptions toolbarOptions;
+  final ToolbarOptions? toolbarOptions;
   const FloatingSearchAppBar({
-    Key key,
+    Key? key,
     Duration implicitDuration = const Duration(milliseconds: 500),
     Curve implicitCurve = Curves.linear,
-    @required this.body,
+    required this.body,
     this.accentColor,
     this.color,
     this.colorOnScroll,
@@ -179,7 +179,7 @@ class FloatingSearchAppBar extends ImplicitlyAnimatedWidget {
   })  : assert(progress == null || (progress is num || progress is bool)),
         super(key, implicitDuration, implicitCurve);
 
-  static FloatingSearchAppBarState of(BuildContext context) {
+  static FloatingSearchAppBarState? of(BuildContext context) {
     return context.findAncestorStateOfType<FloatingSearchAppBarState>();
   }
 
@@ -192,13 +192,45 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
   final ValueNotifier<String> queryNotifer = ValueNotifier('');
   final Handler _handler = Handler();
 
-  AnimationController controller;
-  Animation transitionAnimation;
+  late final controller = AnimationController(vsync: this, duration: transitionDuration)
+    ..value = isAlwaysOpened ? 1.0 : 0.0
+    ..addListener(() => setState(() {}))
+    ..addStatusListener((status) {
+      _setInsets();
 
-  AnimationController scrollController;
-  Animation scrollAnimation;
+      if (status == AnimationStatus.dismissed) {
+        if (widget.clearQueryOnClose) clear();
+      }
+    });
 
-  TextController _input;
+  late var transitionAnimation = CurvedAnimation(
+    parent: controller,
+    curve: widget.transitionCurve,
+  );
+
+  late final scrollController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 200),
+  )..addListener(() => setState(() {}));
+
+  late final scrollAnimation = CurvedAnimation(
+    parent: scrollController,
+    curve: Curves.easeInOutCubic,
+  );
+
+  late final _input = TextController()
+    ..addListener(() {
+      if (_input.text != queryNotifer.value) {
+        queryNotifer.value = _input.text;
+
+        _handler.post(
+          // Do not add a delay when the query is empty.
+          _input.text.isEmpty ? Duration.zero : widget.debounceDelay,
+          () => widget.onQueryChanged?.call(_input.text),
+        );
+      }
+    });
+
   bool _wasUnfocusedOnScroll = false;
 
   bool _isAtTop = true;
@@ -211,19 +243,17 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
   Duration get transitionDuration => widget.transitionDuration;
 
   FloatingSearchAppBarStyle get style => value;
-  double get height => style.height;
-  double get elevation => style.elevation;
-  Color get accentColor => style.accentColor;
-  Color get iconColor => style.iconColor;
-  Color get shadowColor => style.shadowColor;
-  Color get backgroundColor =>
-      Color.lerp(style.backgroundColor, style.colorOnScroll, scrollAnimation.value);
+  Color get backgroundColor => Color.lerp(
+        style.backgroundColor,
+        style.colorOnScroll,
+        scrollAnimation.value,
+      )!;
 
   bool get hasActions => actions.isNotEmpty;
   List<Widget> get actions {
     final actions = widget.actions ?? [FloatingSearchBarAction.searchToClear()];
-    final showHamburger = widget.automaticallyImplyDrawerHamburger &&
-        (Scaffold.of(context)?.hasEndDrawer ?? false);
+    final showHamburger =
+        widget.automaticallyImplyDrawerHamburger && Scaffold.of(context).hasEndDrawer;
     return showHamburger
         ? <Widget>[...actions, FloatingSearchBarAction.hamburgerToBack(isLeading: false)]
         : actions;
@@ -232,10 +262,10 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
   bool get hasleadingActions => leadingActions.isNotEmpty;
   List<Widget> get leadingActions {
     final actions = widget.leadingActions ?? const <Widget>[];
-    final showHamburger = widget.automaticallyImplyDrawerHamburger &&
-        (Scaffold.of(context)?.hasDrawer ?? false);
+    final showHamburger =
+        widget.automaticallyImplyDrawerHamburger && Scaffold.of(context).hasDrawer;
 
-    Widget leading;
+    Widget? leading;
     if (showHamburger) {
       leading = FloatingSearchBarAction.hamburgerToBack();
     } else if (widget.automaticallyImplyBackButton &&
@@ -282,45 +312,6 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
   @override
   void initState() {
     super.initState();
-    _input = TextController()
-      ..addListener(() {
-        if (_input.text != queryNotifer.value) {
-          queryNotifer.value = _input.text;
-
-          _handler.post(
-            // Do not add a delay when the query is empty.
-            _input.text.isEmpty ? Duration.zero : widget.debounceDelay,
-            () => widget.onQueryChanged?.call(_input.text),
-          );
-        }
-      });
-
-    controller = AnimationController(vsync: this, duration: transitionDuration)
-      ..value = isAlwaysOpened ? 1.0 : 0.0
-      ..addListener(() => setState(() {}))
-      ..addStatusListener((status) {
-        _setInsets();
-
-        if (status == AnimationStatus.dismissed) {
-          if (widget.clearQueryOnClose) clear();
-        }
-      });
-
-    transitionAnimation = CurvedAnimation(
-      parent: controller,
-      curve: widget.transitionCurve,
-    );
-
-    scrollController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 200),
-    )..addListener(() => setState(() {}));
-
-    scrollAnimation = CurvedAnimation(
-      parent: scrollController,
-      curve: Curves.easeInOutCubic,
-    );
-
     if (isAlwaysOpened) {
       _isOpen = true;
       postFrame(_input.requestFocus);
@@ -369,7 +360,7 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
 
   void _assignController() => widget.controller?._appBarState = this;
 
-  EdgeInsets insets;
+  late EdgeInsets insets;
   void _setInsets() {
     bool hasActions(List<Widget> actions) {
       final active = List.from(actions)
@@ -397,7 +388,7 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
       ),
       style.insets,
       transitionAnimation.value,
-    );
+    )!;
   }
 
   @override
@@ -413,9 +404,8 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
     final height = style.height + _statusBarHeight;
     double prevPixels = 0.0;
 
-    final brightness = widget.brightness ?? backgroundColor.computeLuminance() > 0.7
-        ? Brightness.light
-        : Brightness.dark;
+    final brightness = widget.brightness ??
+        (backgroundColor.computeLuminance() > 0.7 ? Brightness.light : Brightness.dark);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: brightness == Brightness.dark
@@ -470,7 +460,7 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
       style.elevation,
       style.liftOnScrollElevation,
       scrollAnimation.value,
-    );
+    )!;
 
     final bar = GestureDetector(
       onTap: () {
@@ -507,7 +497,7 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
           bar,
           _FloatingSearchProgressBar(
             progress: widget.progress,
-            color: style.accentColor ?? Theme.of(context).accentColor,
+            color: style.accentColor,
           ),
         ],
       ),
@@ -543,7 +533,7 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
     );
   }
 
-  Widget buildGradient({bool isLeft}) {
+  Widget buildGradient({required bool isLeft}) {
     return Align(
       alignment: isLeft ? Alignment.centerLeft : Alignment.centerRight,
       child: Transform.rotate(
@@ -606,14 +596,15 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
       );
     } else {
       if (widget.title != null) {
-        input = widget.title;
+        input = widget.title!;
 
         if (isAppBar) {
           input = DefaultTextStyle(
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).appBarTheme?.textTheme?.headline6 ??
-                Theme.of(context).textTheme?.headline6,
+            style: Theme.of(context).appBarTheme.textTheme?.headline6 ??
+                Theme.of(context).textTheme.headline6 ??
+                TextStyle(),
             child: input,
           );
         }
@@ -623,10 +614,10 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
 
         final textStyle = hasQuery
             ? style.queryStyle ?? textTheme.subtitle1
-            : style.hintStyle ?? textTheme.subtitle1.copyWith(color: theme.hintColor);
+            : style.hintStyle ?? textTheme.subtitle1?.copyWith(color: theme.hintColor);
 
         input = Text(
-          hasQuery ? query : widget.hint,
+          hasQuery ? query : widget.hint ?? '',
           style: textStyle,
           maxLines: 1,
         );
@@ -666,13 +657,12 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
     return FloatingSearchAppBarStyle(
       height: widget.height ?? kToolbarHeight,
       accentColor: widget.accentColor ?? theme.accentColor,
-      backgroundColor: widget.color ?? theme.cardColor ?? Colors.white,
-      iconColor: widget.iconColor ?? theme.iconTheme.color,
+      backgroundColor: widget.color ?? theme.cardColor,
+      iconColor: widget.iconColor ?? theme.iconTheme.color ?? Colors.grey,
       colorOnScroll: widget.colorOnScroll ?? appBar.color,
       shadowColor: widget.shadowColor ?? appBar.shadowColor ?? Colors.black54,
-      elevation: widget.elevation ?? appBar.elevation,
-      liftOnScrollElevation:
-          widget.liftOnScrollElevation ?? widget.elevation ?? appBar.elevation,
+      elevation: widget.elevation ?? appBar.elevation ?? 0.0,
+      liftOnScrollElevation: widget.liftOnScrollElevation,
       padding: widget.padding?.resolve(direction) ??
           EdgeInsetsDirectional.only(
             start: hasleadingActions ? 12 : 16,
@@ -701,9 +691,9 @@ class _FloatingSearchProgressBar extends StatefulWidget {
   final dynamic progress;
   final Color color;
   const _FloatingSearchProgressBar({
-    Key key,
-    @required this.progress,
-    @required this.color,
+    Key? key,
+    required this.progress,
+    required this.color,
   }) : super(key: key);
 
   @override
@@ -712,22 +702,13 @@ class _FloatingSearchProgressBar extends StatefulWidget {
 
 class _FloatingSearchProgressBarState extends State<_FloatingSearchProgressBar>
     with SingleTickerProviderStateMixin {
-  AnimationController _controller;
+  late final _controller = AnimationController(
+    duration: const Duration(milliseconds: 150),
+    vsync: this,
+  )..addListener(() => setState(() {}));
 
   dynamic get progress => widget.progress;
   bool get showProgressBar => _controller.value > 0.0;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 150),
-      vsync: this,
-    )..addListener(
-        () => setState(() {}),
-      );
-  }
 
   @override
   void didUpdateWidget(_FloatingSearchProgressBar oldWidget) {

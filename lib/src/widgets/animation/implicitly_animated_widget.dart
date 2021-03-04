@@ -8,43 +8,31 @@ abstract class ImplicitlyAnimatedWidget extends StatefulWidget {
   final Duration duration;
   final Curve curve;
   const ImplicitlyAnimatedWidget(
-    Key key,
+    Key? key,
     this.duration,
     this.curve,
-  )   : assert(duration != null),
-        super(key: key);
+  ) : super(key: key);
 }
 
-abstract class ImplicitlyAnimatedWidgetState<T,
-        W extends ImplicitlyAnimatedWidget> extends State<W>
-    with TickerProviderStateMixin {
-  AnimationController _controller;
+abstract class ImplicitlyAnimatedWidgetState<T, W extends ImplicitlyAnimatedWidget>
+    extends State<W> with TickerProviderStateMixin {
+  late final _controller = AnimationController(
+    duration: widget.duration,
+    vsync: this,
+  )..value = 1.0;
 
-  Animation<double> _animation;
-
-  T get newValue;
-  T value;
-  T oldValue;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: widget.duration,
-      vsync: this,
-    )..value = 1.0;
-
-    _animation = CurvedAnimation(
-      curve: widget.curve ?? Curves.linear,
-      parent: _controller,
-    );
-
-    _animation.addListener(
+  late var _animation = CurvedAnimation(
+    curve: widget.curve,
+    parent: _controller,
+  )..addListener(
       () => setState(
         () => value = lerp(oldValue, newValue, _animation.value),
       ),
     );
-  }
+
+  T get newValue;
+  late T value;
+  late T oldValue;
 
   @override
   void didChangeDependencies() {
@@ -57,13 +45,14 @@ abstract class ImplicitlyAnimatedWidgetState<T,
   @override
   void didUpdateWidget(W oldWidget) {
     super.didUpdateWidget(oldWidget);
+
     if (oldWidget.duration != widget.duration) {
       _controller.duration = widget.duration;
     }
 
     if (oldWidget.curve != widget.curve) {
       _animation = CurvedAnimation(
-        curve: widget.curve ?? Curves.linear,
+        curve: widget.curve,
         parent: _controller,
       );
     }

@@ -9,11 +9,11 @@ class CircularReveal extends StatelessWidget {
   final double fraction;
   final Alignment origin;
   final Offset offset;
-  final Widget child;
-  final double minRadius;
-  final double maxRadius;
+  final Widget? child;
+  final double? minRadius;
+  final double? maxRadius;
   const CircularReveal({
-    Key key,
+    Key? key,
     this.fraction = 1.0,
     this.origin = Alignment.center,
     this.offset = Offset.zero,
@@ -42,8 +42,8 @@ class _CircularRevealClipper extends CustomClipper<Path> {
   final double fraction;
   final Alignment origin;
   final Offset offset;
-  final double minRadius;
-  final double maxRadius;
+  final double? minRadius;
+  final double? maxRadius;
   const _CircularRevealClipper({
     this.fraction = 1.0,
     this.origin = Alignment.center,
@@ -61,7 +61,7 @@ class _CircularRevealClipper extends CustomClipper<Path> {
     final minRadius = this.minRadius ?? 0.0;
     final maxRadius = this.maxRadius ?? calcMaxRadius(size, center);
 
-    final radius = lerpDouble(minRadius, maxRadius, fraction);
+    final radius = lerpDouble(minRadius, maxRadius, fraction) ?? 0;
 
     return Path()
       ..addOval(

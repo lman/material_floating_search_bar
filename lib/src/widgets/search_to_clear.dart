@@ -12,16 +12,16 @@ class SearchToClear extends StatelessWidget {
   final bool isEmpty;
   final Duration duration;
   final VoidCallback onTap;
-  final Color color;
+  final Color? color;
   final double size;
 
   /// Creates a Widget that animates between a search and
   /// a clear icon.
   const SearchToClear({
-    Key key,
-    @required this.isEmpty,
+    Key? key,
+    required this.isEmpty,
+    required this.onTap,
     this.duration = const Duration(milliseconds: 500),
-    @required this.onTap,
     this.color,
     this.size = 24.0,
   }) : super(key: key);
@@ -37,7 +37,7 @@ class SearchToClear extends StatelessWidget {
           icon: CustomPaint(
             size: Size.square(size),
             painter: _SearchToClearPainter(
-              color ?? Theme.of(context).iconTheme.color,
+              color ?? Theme.of(context).iconTheme.color ?? Colors.black,
               value,
             ),
           ),
@@ -84,7 +84,7 @@ class _SearchToClearPainter extends CustomPainter {
     final lineStart = Offset(radius * 2, radius * 2);
     final lineEnd = Offset(sw, sw);
     canvas.drawLine(
-      Offset.lerp(lineStart, lineEnd, lineProgress),
+      Offset.lerp(lineStart, lineEnd, lineProgress)!,
       Offset(w - sw, h - sw),
       paint,
     );
@@ -95,7 +95,7 @@ class _SearchToClearPainter extends CustomPainter {
     final circle = Path()
       ..addArc(
         Rect.fromCircle(
-          center: Offset.lerp(circleStart, circleEnd, lineProgress),
+          center: Offset.lerp(circleStart, circleEnd, lineProgress)!,
           radius: radius,
         ),
         32.0.radians,
@@ -108,7 +108,7 @@ class _SearchToClearPainter extends CustomPainter {
     final sLineEnd = Offset(w - sw, sw);
     canvas.drawLine(
       sLineStart,
-      Offset.lerp(sLineStart, sLineEnd, sLineProgress),
+      Offset.lerp(sLineStart, sLineEnd, sLineProgress)!,
       paint,
     );
   }
