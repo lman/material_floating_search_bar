@@ -25,7 +25,8 @@ class SizeFadeTransition extends StatefulWidget {
 }
 
 class _SizeFadeTransitionState extends State<SizeFadeTransition> {
-  late final curve = CurvedAnimation(parent: widget.animation, curve: widget.curve);
+  late final curve =
+      CurvedAnimation(parent: widget.animation, curve: widget.curve);
   late final size =
       CurvedAnimation(curve: Interval(0.0, widget.sizeFraction), parent: curve);
   late final opacity =

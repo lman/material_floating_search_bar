@@ -19,7 +19,8 @@ class FloatingSearchBarAction extends StatelessWidget {
   /// to react to changes in its [FloatingSearchBar].
   ///
   /// View [FloatingSearchBarAction.searchToClear] for an example.
-  final Widget Function(BuildContext context, Animation<double> animation)? builder;
+  final Widget Function(BuildContext context, Animation<double> animation)?
+      builder;
 
   /// Whether this action should be shown when the [FloatingSearchBar]
   /// is opened.
@@ -122,7 +123,8 @@ class FloatingSearchBarAction extends StatelessWidget {
                 if (!isEmpty) {
                   bar.clear();
                 } else {
-                  bar.isOpen = !bar.isOpen || (!bar.hasFocus && bar.isAlwaysOpened);
+                  bar.isOpen =
+                      !bar.isOpen || (!bar.hasFocus && bar.isAlwaysOpened);
                 }
               },
             );
@@ -232,7 +234,8 @@ class FloatingSearchActionBar extends StatelessWidget {
     final currentActions = List<Widget>.from(actions)
       ..removeWhere((action) {
         if (action is FloatingSearchBarAction) {
-          return (isOpen && !action.showIfOpened) || (!isOpen && !action.showIfClosed);
+          return (isOpen && !action.showIfOpened) ||
+              (!isOpen && !action.showIfClosed);
         } else {
           return false;
         }

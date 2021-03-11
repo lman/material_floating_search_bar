@@ -1,3 +1,7 @@
+## 0.2.7
+
+* NNBD support
+
 ## 0.2.6
 
 * **Fixed** `FloatingSearchBarNotifier` notifications on bounce backs/overscroll
