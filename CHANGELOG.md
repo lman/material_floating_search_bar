@@ -1,6 +1,6 @@
-## 0.2.7
+## 0.3.0
 
-* NNBD support
+* **Added** NNBD support
 
 ## 0.2.6
 
