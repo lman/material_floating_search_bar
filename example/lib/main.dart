@@ -101,7 +101,6 @@ class _HomeState extends State<Home> {
         physics: const BouncingScrollPhysics(),
         axisAlignment: isPortrait ? 0.0 : -1.0,
         openAxisAlignment: 0.0,
-        maxWidth: isPortrait ? 600 : 500,
         actions: actions,
         progress: true,
         debounceDelay: const Duration(milliseconds: 500),

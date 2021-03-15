@@ -100,25 +100,25 @@ class FloatingSearchBar extends ImplicitlyAnimatedWidget {
   /// By default the `FloatingSearchBar` will expand
   /// to fill all the available width. This value can
   /// be set to avoid this.
-  final double? maxWidth;
+  final double? width;
 
   /// The max width of the `FloatingSearchBar` when opened.
   ///
   /// This can be used, when the max width when opened should
-  /// be different from the one specified by [maxWidth].
+  /// be different from the one specified by [width].
   ///
-  /// When not specified, will use the value of [maxWidth].
-  final double? openMaxWidth;
+  /// When not specified, will use the value of [width].
+  final double? openWidth;
 
   /// How the `FloatingSearchBar` should be aligned when the
-  /// available width is bigger than the width specified by [maxWidth].
+  /// available width is bigger than the width specified by [width].
   ///
   /// When not specified, defaults to `0.0` which centers
   /// the `FloatingSearchBar`.
   final double? axisAlignment;
 
   /// How the `FloatingSearchBar` should be aligned when the
-  /// available width is bigger than the width specified by [openMaxWidth].
+  /// available width is bigger than the width specified by [openWidth].
   ///
   /// When not specified, will use the value of [axisAlignment].
   final double? openAxisAlignment;
@@ -355,8 +355,8 @@ class FloatingSearchBar extends ImplicitlyAnimatedWidget {
     this.insets,
     this.height = 48.0,
     this.elevation = 4.0,
-    this.maxWidth,
-    this.openMaxWidth,
+    this.width,
+    this.openWidth,
     this.axisAlignment = 0.0,
     this.openAxisAlignment,
     this.border,
@@ -414,7 +414,7 @@ class FloatingSearchBarState extends ImplicitlyAnimatedWidgetState<
       }
     });
 
-  late var animation = CurvedAnimation(parent: _controller, curve: curve);
+  late CurvedAnimation animation = CurvedAnimation(parent: _controller, curve: curve);
 
   late final _translateController = AnimationController(
     vsync: this,
@@ -457,8 +457,11 @@ class FloatingSearchBarState extends ImplicitlyAnimatedWidgetState<
     }
   }
 
-  final ValueNotifier<int> _barRebuilder = ValueNotifier(0);
-  void rebuild() => _barRebuilder.value++;
+  void rebuild() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   double _offset = 0.0;
   double get offset => _offset;
@@ -479,6 +482,8 @@ class FloatingSearchBarState extends ImplicitlyAnimatedWidgetState<
     transition.searchBar = this;
 
     _assignController();
+
+    postFrame(rebuild);
   }
 
   @override
@@ -612,71 +617,59 @@ class FloatingSearchBarState extends ImplicitlyAnimatedWidgetState<
   }
 
   Widget _buildSearchBar() {
-    final isInside = transition.isBodyInsideSearchBar;
-    final boxConstraints =
-        BoxConstraints(maxWidth: transition.lerpMaxWidth() ?? double.infinity);
+    final padding = _resolve(transition.lerpPadding());
+    final borderRadius = transition.lerpBorderRadius();
 
-    final bar = ValueListenableBuilder(
-      valueListenable: _barRebuilder,
-      builder: (context, __, _) {
-        final padding = _resolve(transition.lerpPadding());
-        final borderRadius = transition.lerpBorderRadius();
-
-        final container = Semantics(
-          hidden: !isVisible,
-          focusable: true,
-          focused: isOpen,
-          child: Padding(
-            padding: transition.lerpMargin(),
-            child: Material(
-              elevation: transition.lerpElevation(),
-              shadowColor: style.shadowColor,
+    final container = Semantics(
+      hidden: !isVisible,
+      focusable: true,
+      focused: isOpen,
+      child: Padding(
+        padding: transition.lerpMargin(),
+        child: Material(
+          elevation: transition.lerpElevation(),
+          shadowColor: style.shadowColor,
+          borderRadius: borderRadius,
+          child: Container(
+            width: transition.lerpWidth(),
+            height: transition.lerpHeight(),
+            padding: EdgeInsets.only(top: padding.top, bottom: padding.bottom),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: transition.lerpBackgroundColor(),
+              border: Border.fromBorderSide(style.border),
               borderRadius: borderRadius,
-              child: Container(
-                height: transition.lerpHeight(),
-                padding:
-                    EdgeInsets.only(top: padding.top, bottom: padding.bottom),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: transition.lerpBackgroundColor(),
-                  border: Border.fromBorderSide(style.border),
-                  borderRadius: borderRadius,
-                ),
-                constraints: boxConstraints,
-                child: ClipRRect(
-                  borderRadius: borderRadius,
-                  child: _buildInnerBar(),
-                ),
-              ),
+            ),
+            child: ClipRRect(
+              borderRadius: borderRadius,
+              child: _buildInnerBar(),
             ),
           ),
-        );
-
-        return SlideTransition(
-          position: Tween(
-            begin: Offset.zero,
-            end: const Offset(0.0, -1.0),
-          ).animate(_translateAnimation),
-          child: container,
-        );
-      },
+        ),
+      ),
     );
 
-    if (isInside) return bar;
+    final bar = SlideTransition(
+      position: Tween(
+        begin: Offset.zero,
+        end: const Offset(0.0, -1.0),
+      ).animate(_translateAnimation),
+      child: container,
+    );
 
     return AnimatedAlign(
       duration: isAnimating ? duration : Duration.zero,
       curve: widget.transitionCurve,
       alignment: Alignment(
-          isOpen ? style.openAxisAlignment : style.axisAlignment, 0.0),
-      child: Column(
-        children: <Widget>[
-          bar,
-          Expanded(
-            child: _buildBody(),
-          ),
-        ],
-      ),
+          isOpen ? style.openAxisAlignment : style.axisAlignment, -1.0),
+      child: transition.isBodyInsideSearchBar
+          ? bar
+          : Column(
+              children: <Widget>[
+                bar,
+                Expanded(child: _buildBody()),
+              ],
+            ),
     );
   }
 
@@ -729,7 +722,10 @@ class FloatingSearchBarState extends ImplicitlyAnimatedWidgetState<
             Positioned.fill(
               child: Padding(
                 padding: EdgeInsets.only(top: style.height),
-                child: _buildBody(),
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: _buildBody(),
+                ),
               ),
             ),
           Material(
@@ -742,12 +738,8 @@ class FloatingSearchBarState extends ImplicitlyAnimatedWidgetState<
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  Container(
-                    constraints: style.maxWidth != null
-                        ? BoxConstraints(
-                            maxWidth: transition.lerpInnerMaxWidth()!,
-                          )
-                        : null,
+                  SizedBox(
+                    width: transition.lerpInnerWidth(),
                     child: textField,
                   ),
                   Align(
@@ -775,13 +767,11 @@ class FloatingSearchBarState extends ImplicitlyAnimatedWidgetState<
 
     return IgnorePointer(
       ignoring: widget.isScrollControlled && v < 1.0,
-      child: Container(
-        constraints: style.maxWidth != null
-            ? BoxConstraints(
-                maxWidth: transition.lerpMaxWidth()! +
-                    transition.lerpMargin().horizontal,
-              )
-            : null,
+      child: SizedBox(
+        width: (transition.isBodyInsideSearchBar
+                ? transition.lerpInnerWidth()
+                : transition.lerpWidth()) +
+            transition.lerpMargin().horizontal,
         child: body,
       ),
     );
@@ -809,7 +799,6 @@ class FloatingSearchBarState extends ImplicitlyAnimatedWidgetState<
 
   @override
   void dispose() {
-    _barRebuilder.dispose();
     _controller.dispose();
 
     widget.controller?._searchBarState = null;
@@ -827,8 +816,8 @@ class FloatingSearchBarState extends ImplicitlyAnimatedWidgetState<
     return FloatingSearchBarStyle(
       height: widget.height,
       elevation: widget.elevation,
-      maxWidth: widget.maxWidth,
-      openMaxWidth: widget.openMaxWidth ?? widget.maxWidth,
+      maxWidth: widget.width,
+      openMaxWidth: widget.openWidth,
       axisAlignment: widget.axisAlignment ?? 0.0,
       openAxisAlignment:
           widget.openAxisAlignment ?? widget.axisAlignment ?? 0.0,

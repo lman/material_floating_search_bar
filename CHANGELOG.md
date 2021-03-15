@@ -1,3 +1,8 @@
+## 0.3.2
+
+* **Fixed** #30
+* **Breaking** Renamed `maxWidth` to `width` and `openMaxWidth` to `openWidth`
+
 ## 0.3.1
 
 * **Fixed** Minor bugs

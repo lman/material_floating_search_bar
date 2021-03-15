@@ -17,7 +17,7 @@ Click [here](https://github.com/bnxm/material_floating_search_bar/blob/master/ex
 Add it to your `pubspec.yaml` file:
 ```yaml
 dependencies:
-  material_floating_search_bar: ^0.3.1
+  material_floating_search_bar: ^0.3.2
 ```
 Install packages from the command line
 ```
@@ -58,7 +58,7 @@ Widget buildFloatingSearchBar() {
     physics: const BouncingScrollPhysics(),
     axisAlignment: isPortrait ? 0.0 : -1.0,
     openAxisAlignment: 0.0,
-    maxWidth: isPortrait ? 600 : 500,
+    width: isPortrait ? 600 : 500,
     debounceDelay: const Duration(milliseconds: 500),
     onQueryChanged: (query) {
       // Call your model, bloc, controller here.
@@ -122,8 +122,8 @@ There are many customization options:
 | `insets`                    | The padding between `leadingActions`, the input field and `actions` respectively. <br><br> Only the horizontal values will be honored.
 | `height`                    | The height of the card. <br><br> If not specified, defaults to `48.0` pixels.
 | `elevation`                 | The elevation of the card. 
-| `maxWidth`                  | The max width of the `FloatingSearchBar`. <br><br> By default the `FloatingSearchBar` will expand to fill all the available width. <br><br> This value can be set to avoid this.
-| `openMaxWidth`              | The max width of the `FloatingSearchBar` when opened. <br><br> This can be used, when the max width when opened should be different from the one specified by `maxWidth`. <br><br> When not specified, will use the value of `maxWidth`.
+| `width`                  | The width of the `FloatingSearchBar`. <br><br> By default the `FloatingSearchBar` will expand to fill all the available width. <br><br> This value can be set to avoid this.
+| `openWidth`              | The width of the `FloatingSearchBar` when opened. <br><br> This can be used, when the max width when opened should be different from the one specified by `maxWidth`. <br><br> When not specified, will use the value of `maxWidth`.
 | `axisAlignment`             | How the `FloatingSearchBar` should be aligned when the available width is bigger than the width specified by `maxWidth`. <br><br> When not specified, defaults to `0.0` which centers the `FloatingSearchBar`.
 | `openAxisAlignment`         | How the `FloatingSearchBar` should be aligned when the available width is bigger than the width specified by `openMaxWidth`. <br><br> When not specified, will use the value of `axisAlignment`.
 | `border`                    | The border of the card.

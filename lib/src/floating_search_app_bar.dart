@@ -204,7 +204,7 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
           }
         });
 
-  late var transitionAnimation = CurvedAnimation(
+  late CurvedAnimation transitionAnimation = CurvedAnimation(
     parent: controller,
     curve: widget.transitionCurve,
   );

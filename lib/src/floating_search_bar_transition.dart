@@ -49,8 +49,19 @@ abstract class FloatingSearchBarTransition {
   double lerpHeight() => height;
   double lerpElevation() => elevation;
   double lerpInnerElevation() => 0.0;
-  double? lerpMaxWidth() => lerpDouble(maxWidth, openMaxWidth, t)!;
-  double? lerpInnerMaxWidth() => lerpMaxWidth();
+  double lerpWidth() {
+    if (maxWidth == null && openMaxWidth != null) {
+      return lerpDouble(fullWidth, openMaxWidth, t)!;
+    } else {
+      return lerpDouble(
+        maxWidth ?? fullWidth,
+        openMaxWidth ?? maxWidth ?? fullWidth,
+        t,
+      )!;
+    }
+  }
+
+  double lerpInnerWidth() => lerpWidth();
   EdgeInsetsGeometry lerpPadding() => padding;
   EdgeInsetsGeometry lerpMargin() => margin;
   Color lerpBackgroundColor() => backgroundColor;
@@ -100,10 +111,16 @@ class ExpandingFloatingSearchBarTransition extends FloatingSearchBarTransition {
   double lerpHeight() => lerpDouble(height, fullHeight, t)!;
 
   @override
-  double? lerpMaxWidth() => lerpDouble(maxWidth, fullWidth, t);
+  double lerpWidth() => lerpDouble(maxWidth ?? fullWidth, fullWidth, t)!;
 
   @override
-  double lerpInnerMaxWidth() => lerpDouble(maxWidth, openMaxWidth, t)!;
+  double lerpInnerWidth() {
+    return lerpDouble(
+      maxWidth ?? fullWidth,
+      openMaxWidth ?? fullWidth,
+      t,
+    )!;
+  }
 
   @override
   double lerpInnerElevation() {

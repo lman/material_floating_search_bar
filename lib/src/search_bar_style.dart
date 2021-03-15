@@ -40,8 +40,10 @@ class FloatingSearchBarStyle {
     return FloatingSearchBarStyle(
       height: lerpDouble(height, b.height, t)!,
       elevation: lerpDouble(elevation, b.elevation, t)!,
-      maxWidth: lerpDouble(maxWidth, b.maxWidth, t),
-      openMaxWidth: lerpDouble(openMaxWidth, b.openMaxWidth, t),
+      maxWidth: b.maxWidth == null ? null : lerpDouble(maxWidth, b.maxWidth, t),
+      openMaxWidth: b.openMaxWidth == null
+          ? null
+          : lerpDouble(openMaxWidth, b.openMaxWidth, t),
       axisAlignment: lerpDouble(axisAlignment, b.axisAlignment, t)!,
       openAxisAlignment: lerpDouble(openAxisAlignment, b.openAxisAlignment, t)!,
       backgroundColor: Color.lerp(backgroundColor, b.backgroundColor, t)!,
