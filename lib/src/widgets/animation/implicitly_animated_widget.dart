@@ -20,28 +20,22 @@ abstract class ImplicitlyAnimatedWidgetState<T,
   late final _controller = AnimationController(
     duration: widget.duration,
     vsync: this,
-  )..value = 1.0;
-
-  late var _animation = CurvedAnimation(
-    curve: widget.curve,
-    parent: _controller,
-  )..addListener(
+  )
+    ..value = 1.0
+    ..addListener(
       () => setState(
         () => value = lerp(oldValue, newValue, _animation.value),
       ),
     );
 
+  late var _animation = CurvedAnimation(
+    curve: widget.curve,
+    parent: _controller,
+  );
+
   T get newValue;
-  late T value;
-  late T oldValue;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    value = newValue;
-    oldValue = newValue;
-  }
+  late T value = newValue;
+  late T oldValue = newValue;
 
   @override
   void didUpdateWidget(W oldWidget) {
@@ -60,8 +54,10 @@ abstract class ImplicitlyAnimatedWidgetState<T,
 
     if (value != newValue) {
       oldValue = value;
-      _controller.reset();
-      _controller.forward();
+
+      _controller
+        ..reset()
+        ..forward();
     }
   }
 

@@ -34,7 +34,6 @@ class _ImplicitAnimationBuilderState<T>
   T lerp(T a, T b, double t) => widget.lerp(a, b, t);
 
   @override
-  Widget build(BuildContext context) {
-    return widget.builder(context, value, widget.child);
-  }
+  Widget build(BuildContext context) =>
+      widget.builder(context, value, widget.child);
 }

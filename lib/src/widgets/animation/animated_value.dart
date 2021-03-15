@@ -22,10 +22,10 @@ class AnimatedValue extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ImplicitAnimationBuilder<double>(
-      lerp: (a, b, t) => lerpDouble(a, b, t)!,
       value: value,
       curve: curve,
       duration: duration,
+      lerp: (a, b, t) => lerpDouble(a, b, t)!,
       builder: (context, value, _) => builder(context, value),
     );
   }

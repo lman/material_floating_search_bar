@@ -721,8 +721,6 @@ class FloatingSearchBarState extends ImplicitlyAnimatedWidgetState<
       shadowColor: style.shadowColor,
     );
 
-    final padding = _resolve(transition.lerpPadding());
-
     return SizedBox.expand(
       child: Stack(
         alignment: Alignment.topCenter,
@@ -750,8 +748,6 @@ class FloatingSearchBarState extends ImplicitlyAnimatedWidgetState<
                             maxWidth: transition.lerpInnerMaxWidth()!,
                           )
                         : null,
-                    padding: EdgeInsets.only(
-                        left: padding.left, right: padding.right),
                     child: textField,
                   ),
                   Align(
@@ -848,7 +844,7 @@ class FloatingSearchBarState extends ImplicitlyAnimatedWidgetState<
                   8, MediaQuery.of(context).viewPadding.top + 6, 8, 0))
           .resolve(direction),
       padding: widget.padding?.resolve(direction) ??
-          const EdgeInsets.symmetric(horizontal: 8),
+          const EdgeInsets.symmetric(horizontal: 12),
       insets: widget.insets?.resolve(direction) ??
           const EdgeInsets.symmetric(horizontal: 8),
     );

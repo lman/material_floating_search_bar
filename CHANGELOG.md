@@ -1,3 +1,8 @@
+## 0.3.1
+
+* **Fixed** Minor bugs
+* **Fixed** Example application
+
 ## 0.3.0
 
 * **Added** NNBD support
@@ -39,4 +44,4 @@
 
 ## 0.1.0
 
-* Initial release
+* **Initial release**

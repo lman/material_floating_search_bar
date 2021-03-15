@@ -286,8 +286,10 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
   bool get isOpen => _isOpen;
   set isOpen(bool value) {
     if (value) {
-      post(transitionDuration, focus);
-      controller.forward();
+      () async {
+        await controller.forward();
+        focus();
+      }();
     } else {
       unfocus();
 

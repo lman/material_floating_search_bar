@@ -103,11 +103,11 @@ class _HomeState extends State<Home> {
         openAxisAlignment: 0.0,
         maxWidth: isPortrait ? 600 : 500,
         actions: actions,
-        progress: model.isLoading,
+        progress: true,
         debounceDelay: const Duration(milliseconds: 500),
         onQueryChanged: model.onQueryChanged,
         scrollPadding: EdgeInsets.zero,
-        transition: CircularFloatingSearchBarTransition(),
+        transition: CircularFloatingSearchBarTransition(spacing: 16),
         builder: (context, _) => buildExpandableBody(model),
         body: buildBody(),
       ),
@@ -133,28 +133,30 @@ class _HomeState extends State<Home> {
   }
 
   Widget buildExpandableBody(SearchModel model) {
-    return Material(
-      color: Colors.white,
-      elevation: 4.0,
-      borderRadius: BorderRadius.circular(8),
-      child: ImplicitlyAnimatedList<Place>(
-        shrinkWrap: true,
-        padding: EdgeInsets.zero,
-        physics: const NeverScrollableScrollPhysics(),
-        items: model.suggestions.take(6).toList(),
-        areItemsTheSame: (a, b) => a == b,
-        itemBuilder: (context, animation, place, i) {
-          return SizeFadeTransition(
-            animation: animation,
-            child: buildItem(context, place),
-          );
-        },
-        updateItemBuilder: (context, animation, place) {
-          return FadeTransition(
-            opacity: animation,
-            child: buildItem(context, place),
-          );
-        },
+    return Padding(
+      padding: const EdgeInsets.only(top: 16.0),
+      child: Material(
+        color: Colors.white,
+        elevation: 4.0,
+        borderRadius: BorderRadius.circular(8),
+        child: ImplicitlyAnimatedList<Place>(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          items: model.suggestions.take(6).toList(),
+          areItemsTheSame: (a, b) => a == b,
+          itemBuilder: (context, animation, place, i) {
+            return SizeFadeTransition(
+              animation: animation,
+              child: buildItem(context, place),
+            );
+          },
+          updateItemBuilder: (context, animation, place) {
+            return FadeTransition(
+              opacity: animation,
+              child: buildItem(context, place),
+            );
+          },
+        ),
       ),
     );
   }
