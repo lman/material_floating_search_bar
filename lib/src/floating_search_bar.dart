@@ -414,7 +414,8 @@ class FloatingSearchBarState extends ImplicitlyAnimatedWidgetState<
       }
     });
 
-  late CurvedAnimation animation = CurvedAnimation(parent: _controller, curve: curve);
+  late CurvedAnimation animation =
+      CurvedAnimation(parent: _controller, curve: curve);
 
   late final _translateController = AnimationController(
     vsync: this,

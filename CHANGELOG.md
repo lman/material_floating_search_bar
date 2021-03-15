@@ -1,4 +1,4 @@
-## 0.3.2
+## 0.3.3
 
 * **Fixed** #30
 * **Breaking** Renamed `maxWidth` to `width` and `openMaxWidth` to `openWidth`
