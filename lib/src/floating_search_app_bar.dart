@@ -134,6 +134,8 @@ class FloatingSearchAppBar extends ImplicitlyAnimatedWidget {
   /// {@macro floating_search_bar.autocorrect}
   final bool autocorrect;
 
+  final Function? onBackInterceptedF;
+
   /// {@macro floating_search_bar.toolbarOptions}
   final ToolbarOptions? toolbarOptions;
   const FloatingSearchAppBar({
@@ -176,6 +178,7 @@ class FloatingSearchAppBar extends ImplicitlyAnimatedWidget {
     this.textInputType = TextInputType.text,
     this.autocorrect = true,
     this.toolbarOptions,
+    this.onBackInterceptedF,
   })  : assert(progress == null || (progress is num || progress is bool)),
         super(key, implicitDuration, implicitCurve);
 
@@ -276,6 +279,7 @@ class FloatingSearchAppBarState extends ImplicitlyAnimatedWidgetState<
         (Navigator.canPop(context) || widget.body != null)) {
       leading = FloatingSearchBarAction.back(
         showIfClosed: Navigator.canPop(context),
+        onBackInterceptedF: widget.onBackInterceptedF,
       );
     }
 
