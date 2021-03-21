@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'floating_search_bar.dart';
 import 'widgets/widgets.dart';
 
@@ -36,6 +35,8 @@ class FloatingSearchBarAction extends StatelessWidget {
   /// bar [FloatingSearchBar] closed.
   final bool showIfClosed;
 
+  final Function? onBackInterceptedF;
+
   /// Creates a widget to be displayed in a row before or after the
   /// input text of a [FloatingSearchBar].
   ///
@@ -46,6 +47,7 @@ class FloatingSearchBarAction extends StatelessWidget {
     this.builder,
     this.showIfOpened = false,
     this.showIfClosed = true,
+    this.onBackInterceptedF,
   })  : assert(builder != null || child != null),
         super(key: key);
 
@@ -138,27 +140,33 @@ class FloatingSearchBarAction extends StatelessWidget {
     double size = 24,
     Color? color,
     bool showIfClosed = false,
+    Function? onBackInterceptedF,
   }) {
     return FloatingSearchBarAction(
       showIfClosed: showIfClosed,
       showIfOpened: true,
+      onBackInterceptedF: onBackInterceptedF,
       builder: (context, animation) {
         final canPop = Navigator.canPop(context);
+        final onBackIntercepted = onBackInterceptedF;
 
-        return CircularButton(
-          tooltip: 'Back',
-          size: size,
-          icon: Icon(Icons.arrow_back, color: color, size: size),
-          onPressed: () {
-            final bar = FloatingSearchAppBar.of(context)!;
+          return CircularButton(
+            tooltip: 'Back',
+            size: size,
+            icon: Icon(Icons.arrow_back, color: color, size: size),
+            onPressed: () {
+              final bar = FloatingSearchAppBar.of(context)!;
 
-            if (bar.isOpen && !bar.isAlwaysOpened) {
-              bar.close();
-            } else if (canPop) {
-              Navigator.pop(context);
-            }
-          },
-        );
+              if (bar.isOpen && !bar.isAlwaysOpened) {
+                bar.close(); 
+              } else if (
+                (canPop && onBackIntercepted == null) 
+                || (canPop && onBackIntercepted != null && !onBackIntercepted())
+              ) {
+                Navigator.pop(context);
+              }
+            },
+          );
       },
     );
   }
